@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBM Maximo REST API — Complete Session Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #0f1628;
+    --surface2: #151d35;
+    --border: #1e2d50;
+    --accent: #1a73e8;
+    --accent2: #00d4aa;
+    --accent3: #f59e0b;
+    --text: #e2e8f0;
+    --text-dim: #8899bb;
+    --text-faint: #4a5878;
+    --code-bg: #060c1a;
+    --get: #00d4aa;
+    --post: #3b82f6;
+    --delete: #ef4444;
+    --patch: #f59e0b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #060c1a 0%, #0a1535 50%, #050d20 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(26,115,232,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: 20%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,212,170,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(26,115,232,0.15);
+    border: 1px solid rgba(26,115,232,0.4);
+    color: #60a5fa;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #e2e8f0 0%, #60a5fa 60%, #00d4aa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  .hero-sub {
+    color: var(--text-dim);
+    font-size: 15px;
+    max-width: 600px;
+    font-weight: 300;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  .hero-meta span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hero-meta span b { color: var(--text-dim); }
+
+  /* NAVIGATION */
+  .toc {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 14px 18px;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .toc a:hover { color: var(--text); border-bottom-color: var(--accent); }
+
+  /* LAYOUT */
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px; }
+
+  /* SECTIONS */
+  .section {
+    margin-bottom: 60px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(26,115,232,0.1);
+    border: 1px solid rgba(26,115,232,0.25);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .section-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .section-header p {
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-left: auto;
+  }
+
+  /* API CARDS */
+  .api-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .api-card:hover { border-color: #2a3d60; }
+
+  .api-card-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .method {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .method.GET  { background: rgba(0,212,170,0.15); color: var(--get); border: 1px solid rgba(0,212,170,0.3); }
+  .method.POST { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+  .method.DELETE { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+  .method.PATCH { background: rgba(245,158,11,0.15); color: var(--accent3); border: 1px solid rgba(245,158,11,0.3); }
+
+  .api-title { flex: 1; }
+  .api-title h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .api-title .endpoint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .api-title .endpoint .path-param { color: var(--accent3); }
+  .api-title .endpoint .query-param { color: #a78bfa; }
+
+  .api-card-body { padding: 20px; }
+  .api-desc {
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    overflow: hidden;
+    margin: 12px 0;
+  }
+  .code-block-header {
+    background: #0c1220;
+    border-bottom: 1px solid var(--border);
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .code-block-header span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .code-block pre {
+    padding: 16px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #cbd5e1;
+  }
+  .code-block pre .kw { color: #60a5fa; }
+  .code-block pre .str { color: #86efac; }
+  .code-block pre .num { color: #fb923c; }
+  .code-block pre .key { color: #c084fc; }
+  .code-block pre .comment { color: #4a5878; font-style: italic; }
+  .code-block pre .url { color: var(--accent2); }
+  .code-block pre .header { color: var(--accent3); }
+
+  /* LABEL */
+  .label {
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Syne', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-faint);
+    margin: 16px 0 8px;
+  }
+
+  /* PARAMS TABLE */
+  .params-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin: 12px 0;
+  }
+  .params-table th {
+    text-align: left;
+    padding: 8px 12px;
+    background: var(--surface2);
+    color: var(--text-faint);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .params-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(30,45,80,0.5);
+    vertical-align: top;
+    color: var(--text-dim);
+  }
+  .params-table td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    color: #a78bfa;
+    font-size: 11px;
+  }
+  .params-table tr:last-child td { border-bottom: none; }
+
+  /* NOTE BOX */
+  .note {
+    background: rgba(26,115,232,0.06);
+    border: 1px solid rgba(26,115,232,0.2);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    margin: 12px 0;
+  }
+  .note strong { color: #60a5fa; }
+
+  .warn {
+    background: rgba(245,158,11,0.06);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-left: 3px solid var(--accent3);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    margin: 12px 0;
+  }
+  .warn strong { color: var(--accent3); }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* OPERATOR TABLE */
+  .op-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    background: var(--surface);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .op-table th {
+    padding: 10px 14px;
+    background: var(--surface2);
+    text-align: left;
+    color: var(--text-faint);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .op-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(30,45,80,0.4);
+    color: var(--text-dim);
+  }
+  .op-table td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent2);
+    font-weight: 600;
+  }
+  .op-table td:nth-child(3) {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #86efac;
+  }
+  .op-table tr:last-child td { border-bottom: none; }
+
+  /* FLOW DIAGRAM */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    background: var(--surface2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    flex-wrap: wrap;
+    margin: 12px 0;
+  }
+  .flow-step {
+    background: rgba(26,115,232,0.12);
+    border: 1px solid rgba(26,115,232,0.25);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #93c5fd;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .flow-arrow { color: var(--text-faint); font-size: 16px; }
+
+  /* DIVIDER */
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 30px 0;
+  }
+
+  /* TAG */
+  .tag {
+    display: inline-block;
+    background: rgba(0,212,170,0.1);
+    color: var(--accent2);
+    border: 1px solid rgba(0,212,170,0.2);
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  footer {
+    text-align: center;
+    padding: 40px;
+    border-top: 1px solid var(--border);
+    color: var(--text-faint);
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Session Reference</div>
+  <h1>IBM Maximo REST API<br>Complete Guide</h1>
+  <p class="hero-sub">End-to-end API documentation covering authentication, querying, CRUD operations, attachments, workflow integration, and automation scripts.</p>
+  <div class="hero-meta">
+    <span>📦 <b>Source:</b> ibm-maximo-dev.github.io/maximo-restapi-documentation</span>
+    <span>🔧 <b>Applies to:</b> Maximo 7.6.0.2+ / MAS</span>
+    <span>📝 <b>Format:</b> REST/JSON (lean=1)</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="toc">
+  <a href="#overview">Overview</a>
+  <a href="#auth">Authentication</a>
+  <a href="#apikeys">API Keys</a>
+  <a href="#query">Query (GET)</a>
+  <a href="#filter">Filtering</a>
+  <a href="#sort">Sort & Paging</a>
+  <a href="#crud">CRUD</a>
+  <a href="#delete">Delete</a>
+  <a href="#bulk">Bulk & Sync</a>
+  <a href="#actions">Actions</a>
+  <a href="#scripts">Auto Scripts</a>
+  <a href="#attachments">Attachments</a>
+  <a href="#workflow">Workflow</a>
+</nav>
+
+<div class="container">
+
+<!-- ======================== OVERVIEW ======================== -->
+<div class="section" id="overview">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>Overview & Architecture</h2>
+  </div>
+
+  <p style="color:var(--text-dim); margin-bottom: 18px;">The Maximo REST APIs are integrated starting from version <strong style="color:var(--text)">7.6.0.2</strong> and use the same codebase as the OSLC APIs. They support end-to-end JSON with no namespace requirement (lean mode).</p>
+
+  <div class="flow">
+    <div class="flow-step">Client Request</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Authentication</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">API Routes</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Authorization</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">MBO / Workflow / Scripts</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">JSON Response</div>
+  </div>
+
+  <div class="note"><strong>Tip:</strong> Always add <code>lean=1</code> to every request for namespace-free JSON and proper load-balancing support. Example: <code>GET /oslc/os/mxapiasset?lean=1</code></div>
+
+  <div class="label">Base URL Patterns</div>
+  <div class="code-block">
+    <div class="code-block-header"><span>URL Roots</span></div>
+    <pre><span class="comment"># Standard (Maximo native auth)</span>
+<span class="url">/oslc/os/{objectStructureName}</span>
+
+<span class="comment"># API Key route (bypasses app-server security constraints)</span>
+<span class="url">/api/os/{objectStructureName}</span>
+
+<span class="comment"># Automation Scripts</span>
+<span class="url">/oslc/script/{scriptName}</span>
+
+<span class="comment"># Login / Logout</span>
+<span class="url">POST /oslc/login</span>
+<span class="url">GET  /oslc/logout</span></pre>
+  </div>
+</div>
+
+<!-- ======================== AUTH ======================== -->
+<div class="section" id="auth">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>Authentication</h2>
+  </div>
+
+  <div class="grid-2">
+
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="method POST">POST</span>
+        <div class="api-title">
+          <h3>Maximo Native Auth</h3>
+          <div class="endpoint">/oslc/login</div>
+        </div>
+      </div>
+      <div class="api-card-body">
+        <p class="api-desc">Maximo manages the user repository. Credentials are passed as a Base64-encoded <code>userid:password</code> in the <code>MAXAUTH</code> header.</p>
+        <div class="label">Request</div>
+        <div class="code-block">
+          <div class="code-block-header"><span>HTTP</span></div>
+          <pre><span class="kw">POST</span> <span class="url">/oslc/login</span>
+<span class="header">maxauth:</span> <span class="str">dXNlcjpwYXNz</span>  <span class="comment"># base64(user:pass)</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="method POST">POST</span>
+        <div class="api-title">
+          <h3>LDAP / BASIC Auth</h3>
+          <div class="endpoint">/oslc/login</div>
+        </div>
+      </div>
+      <div class="api-card-body">
+        <p class="api-desc">App-server manages authentication. Credentials passed via the standard HTTP <code>Authorization</code> header.</p>
+        <div class="label">Request</div>
+        <div class="code-block">
+          <div class="code-block-header"><span>HTTP</span></div>
+          <pre><span class="kw">POST</span> <span class="url">/oslc/login</span>
+<span class="header">Authorization:</span> <span class="str">BASIC dXNlcjpwYXNz</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="method POST">POST</span>
+        <div class="api-title">
+          <h3>FORM Auth</h3>
+          <div class="endpoint">/j_security_check</div>
+        </div>
+      </div>
+      <div class="api-card-body">
+        <p class="api-desc">Form-encoded POST. Response includes <code>jsessionid</code> and LTPA token cookies that must be replayed in subsequent calls.</p>
+        <div class="label">Request</div>
+        <div class="code-block">
+          <div class="code-block-header"><span>HTTP</span></div>
+          <pre><span class="kw">POST</span> <span class="url">/j_security_check</span>
+<span class="header">Content-Type:</span> <span class="str">application/x-www-form-urlencoded</span>
+
+<span class="key">j_username</span>=<span class="str">wilson</span>&<span class="key">j_password</span>=<span class="str">wilson</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="method GET">GET</span>
+        <div class="api-title">
+          <h3>Logout</h3>
+          <div class="endpoint">/oslc/logout</div>
+        </div>
+      </div>
+      <div class="api-card-body">
+        <p class="api-desc">Terminates the server-side session. Not required when using API keys (stateless/silent login).</p>
+        <div class="label">Request</div>
+        <div class="code-block">
+          <div class="code-block-header"><span>HTTP</span></div>
+          <pre><span class="kw">GET</span> <span class="url">/oslc/logout</span></pre>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ======================== API KEYS ======================== -->
+<div class="section" id="apikeys">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2>API Keys</h2>
+  </div>
+
+  <p class="api-desc" style="margin-bottom:18px;">API keys enable stateless/headless calls without user credentials. Each user can have one key; calls run in the context of that user and respect all permissions. No <code>/logout</code> needed.</p>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method POST">POST</span>
+      <div class="api-title">
+        <h3>Create API Key (for logged-in user)</h3>
+        <div class="endpoint">/oslc/apitoken/create</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <div class="label">Request Body</div>
+      <div class="code-block">
+        <div class="code-block-header"><span>JSON</span></div>
+        <pre>{
+  <span class="key">"expiration"</span>: <span class="num">-1</span>   <span class="comment">// -1 = never expires. Use minutes for expiry time</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method POST">POST</span>
+      <div class="api-title">
+        <h3>Create API Key (admin — for any user)</h3>
+        <div class="endpoint">/oslc/os/mxapiapikey</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <div class="label">Request Body</div>
+      <div class="code-block">
+        <div class="code-block-header"><span>JSON</span></div>
+        <pre>{
+  <span class="key">"expiration"</span>: <span class="num">-1</span>,
+  <span class="key">"userid"</span>: <span class="str">"WILSON"</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="method POST">POST</span>
+        <div class="api-title">
+          <h3>Revoke API Key</h3>
+          <div class="endpoint">/oslc/apitoken/revoke</div>
+        </div>
+      </div>
+      <div class="api-card-body">
+        <p class="api-desc">Revokes the API key for the currently authenticated user. No body required.</p>
+      </div>
+    </div>
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="method DELETE">DELETE</span>
+        <div class="api-title">
+          <h3>Delete API Key (admin)</h3>
+          <div class="endpoint">/oslc/os/mxapiapikey/<span class="path-param">{id}</span></div>
+        </div>
+      </div>
+      <div class="api-card-body">
+        <p class="api-desc">Admin deletes a specific API key by its record ID.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>Using API Key in Requests</h3>
+        <div class="endpoint">/oslc/os/mxapiasset?<span class="query-param">apikey=&lt;value&gt;</span>&lean=1</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Pass the key as a query param or as a request header. Header is preferred for security.</p>
+      <div class="grid-2">
+        <div>
+          <div class="label">Option 1 — Query Param</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>HTTP</span></div>
+            <pre><span class="kw">GET</span> <span class="url">/oslc/os/mxapiasset</span>?<span class="key">apikey</span>=<span class="str">abc123</span>&lean=1</pre>
+          </div>
+        </div>
+        <div>
+          <div class="label">Option 2 — Header (Recommended)</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>HTTP</span></div>
+            <pre><span class="kw">GET</span> <span class="url">/api/os/mxapiasset</span>?lean=1
+<span class="header">apikey:</span> <span class="str">abc123</span>
+<span class="header">x-public-uri:</span> http://host:port/maximo/api</pre>
+          </div>
+        </div>
+      </div>
+      <div class="note"><strong>Note:</strong> For app-server auth deployments, use the <code>/api</code> route instead of <code>/oslc</code> — it is not security-constrained, enabling apikey-based calls with SAML/OIDC setups.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ======================== QUERY ======================== -->
+<div class="section" id="query">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2>Query (GET) — Selecting Data</h2>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>Get Collection (all records)</h3>
+        <div class="endpoint">/oslc/os/mxapiasset?<span class="query-param">oslc.pageSize=10</span>&lean=1</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Returns a paged collection of asset records. Each member contains only an <code>href</code> link by default unless <code>oslc.select</code> is used.</p>
+      <div class="label">Response Structure</div>
+      <div class="code-block">
+        <div class="code-block-header"><span>JSON Response</span></div>
+        <pre>{
+  <span class="key">"member"</span>: [
+    { <span class="key">"href"</span>: <span class="str">"http://host/maximo/oslc/os/mxapiasset/_QTYwMDI..."</span> },
+    { <span class="key">"href"</span>: <span class="str">"http://host/maximo/oslc/os/mxapiasset/_TDEyNTEw..."</span> }
+  ],
+  <span class="key">"responseInfo"</span>: {
+    <span class="key">"href"</span>: <span class="str">"..."</span>,
+    <span class="key">"nextPage"</span>: { <span class="key">"href"</span>: <span class="str">"..."</span> },
+    <span class="key">"pagenum"</span>: <span class="num">1</span>,
+    <span class="key">"totalCount"</span>: <span class="num">250</span>   <span class="comment">// only if collectioncount=1</span>
+  }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>Select Specific Attributes</h3>
+        <div class="endpoint">/oslc/os/mxapiasset?<span class="query-param">oslc.select=assetnum,location,description,status</span>&lean=1</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Use <code>oslc.select</code> to specify which attributes to return. Domain-bound attributes automatically include a <code>_description</code> companion field (e.g. <code>status_description</code>).</p>
+      <div class="code-block">
+        <div class="code-block-header"><span>Example with page size</span></div>
+        <pre><span class="kw">GET</span> <span class="url">/oslc/os/mxapiasset</span>?<span class="key">oslc.pageSize</span>=<span class="num">2</span>
+  &<span class="key">oslc.select</span>=<span class="str">assetnum,location,description,status</span>
+  &lean=<span class="num">1</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>Select Child Object Attributes</h3>
+        <div class="endpoint">/oslc/os/mxapiasset?<span class="query-param">oslc.select=assetnum,assetmeter{*}</span></div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Use curly-brace notation to inline child object data. <code>*</code> selects all attributes; or list them explicitly. Supports multiple nesting levels.</p>
+      <div class="grid-2">
+        <div>
+          <div class="label">All child attributes</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>Select Clause</span></div>
+            <pre>oslc.select=assetnum,status,<span class="key">assetmeter{*}</span></pre>
+          </div>
+        </div>
+        <div>
+          <div class="label">Nested child objects</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>Nested</span></div>
+            <pre>oslc.select=<span class="key">obj1{prop1,obj2{attr1,attr2}}</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>Select Related Object Attributes (Dot Notation)</h3>
+        <div class="endpoint">/oslc/os/mxapiasset?<span class="query-param">oslc.select=assetnum,location.description,location.status</span></div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Dot notation fetches attributes from related MBOs not in the object structure. Use aliasing (<code>--</code>) when attribute name clashes with relation name.</p>
+      <div class="grid-2">
+        <div>
+          <div class="label">Dot notation (1:1)</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>Example</span></div>
+            <pre>oslc.select=assetnum,
+  <span class="key">location--mylocation</span>,
+  location.status,
+  location.description</pre>
+          </div>
+        </div>
+        <div>
+          <div class="label">rel notation (1:many)</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>Example</span></div>
+            <pre>oslc.select=assetnum,
+  <span class="key">rel.openwo{wonum,description}</span>
+&oslc.where=openwo.wonum=<span class="str">"*"</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>Traverse to Related MboSet</h3>
+        <div class="endpoint">/oslc/os/mxapiasset/<span class="path-param">{rest id}</span>/openwo?oslc.select=*</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Use a relationship name as a URI token to navigate to a related collection. Can be chained recursively.</p>
+      <div class="label">Examples</div>
+      <div class="code-block">
+        <div class="code-block-header"><span>HTTP</span></div>
+        <pre><span class="comment"># Navigate to work orders of an asset</span>
+<span class="kw">GET</span> <span class="url">/oslc/os/mxapiasset/{rest id}/openwo</span>?oslc.select=*
+
+<span class="comment"># Return as a specific object structure</span>
+<span class="kw">GET</span> <span class="url">/oslc/os/mxapiasset/{rest id}/openwo.mxapiwodetail</span>?oslc.select=*
+
+<span class="comment"># Chain deeper</span>
+<span class="kw">GET</span> <span class="url">/oslc/os/mxapiasset/{rest id}/openwo/{rest id}/jobplan</span>?oslc.select=*</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>Get Total Count Only</h3>
+        <div class="endpoint">/oslc/os/mxapiasset?<span class="query-param">count=1</span></div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <div class="grid-2">
+        <div>
+          <div class="label">Count only</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>Response</span></div>
+            <pre>{ <span class="key">"totalCount"</span>: <span class="num">10</span> }</pre>
+          </div>
+        </div>
+        <div>
+          <div class="label">Count with results</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>Query Param</span></div>
+            <pre>?<span class="key">collectioncount</span>=<span class="num">1</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>Formula Properties (Dynamic Attributes)</h3>
+        <div class="endpoint">/oslc/os/mxapiasset?<span class="query-param">oslc.select=assetnum,exp.myreplacecost</span></div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Select object formula values using <code>exp.</code> prefix. No db config or admin mode required — great alternative to non-persistent attributes.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span>Response</span></div>
+        <pre>{
+  <span class="key">"assetnum"</span>: <span class="str">"L12510"</span>,
+  <span class="key">"myreplacecost"</span>: <span class="num">1450.0</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ======================== FILTER ======================== -->
+<div class="section" id="filter">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2>Filtering — oslc.where</h2>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>Basic Where Filter</h3>
+        <div class="endpoint">/oslc/os/mxapiasset?<span class="query-param">oslc.where=status="OPERATING"</span>&lean=1</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <div class="label">Operators Reference</div>
+      <table class="op-table">
+        <thead><tr><th>Operator</th><th>Description</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>=</td><td>Equals</td><td>status="APPR"</td></tr>
+          <tr><td>>=</td><td>Greater than or equal</td><td>priority>=1</td></tr>
+          <tr><td>></td><td>Greater than</td><td>startdate>"2024-01-01T00:00:00-05:00"</td></tr>
+          <tr><td><</td><td>Less than</td><td>linecost<200.5</td></tr>
+          <tr><td><=</td><td>Less than or equal</td><td>priority<=3</td></tr>
+          <tr><td>!=</td><td>Not equals</td><td>priority!=2</td></tr>
+          <tr><td>in</td><td>In list</td><td>location in ["A","B","C"]</td></tr>
+          <tr><td>%value%</td><td>Contains (LIKE)</td><td>status="%APPR%"</td></tr>
+          <tr><td>value%</td><td>Starts with</td><td>status="APPR%"</td></tr>
+          <tr><td>%value</td><td>Ends with</td><td>status="%APPR"</td></tr>
+          <tr><td>="*"</td><td>IS NOT NULL</td><td>status="*"</td></tr>
+          <tr><td>!="*"</td><td>IS NULL</td><td>status!="*"</td></tr>
+        </tbody>
+      </table>
+
+      <div class="label">Examples</div>
+      <div class="code-block">
+        <div class="code-block-header"><span>Where Clause Examples</span></div>
+        <pre><span class="comment"># Multiple conditions</span>
+?oslc.where=<span class="key">status</span>=<span class="str">"OPERATING"</span> and <span class="key">location.status</span>=<span class="str">"OPERATING"</span>
+
+<span class="comment"># Date range + numeric + boolean</span>
+?oslc.where=<span class="key">priority</span>><span class="num">1</span> and <span class="key">priority</span><=<span class="num">3</span>
+  and <span class="key">installdate</span>>=<span class="str">"1999-02-06T00:00:00-05:00"</span>
+  and <span class="key">linear</span>=<span class="num">false</span>
+
+<span class="comment"># In clause with strings</span>
+?oslc.where=<span class="key">status</span> in [<span class="str">"OPERATING"</span>,<span class="str">"ACTIVE"</span>]
+
+<span class="comment"># In clause with numbers</span>
+?oslc.where=<span class="key">priority</span> in [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>]</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>Timeline Filter</h3>
+        <div class="endpoint">/oslc/os/mxapiwodetail?<span class="query-param">tlrange=-3M&tlattribute=reportdate</span></div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Simplified date-range queries indexed on current date. Supports Y (years), M (months), D (days), and +/- directions.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span>Timeline Examples</span></div>
+        <pre><span class="comment"># Work orders reported in the past 3 months</span>
+?<span class="key">tlrange</span>=<span class="str">-3M</span>&<span class="key">tlattribute</span>=reportdate
+
+<span class="comment"># 3 years before AND after current date (range)</span>
+?<span class="key">tlrange</span>=<span class="str">+-3Y</span>&<span class="key">tlattribute</span>=reportdate
+
+<span class="comment"># Index on a specific date instead of today</span>
+?<span class="key">tlattribute</span>=reportdate=<span class="str">2024-01-01T00:00:00-05:00</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>Classification Attribute Search</h3>
+        <div class="endpoint">/oslc/os/mxapiasset?<span class="query-param">attributesearch=[SPEED:>=50]</span></div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Search assets/locations/items by their classification spec attributes.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span>Examples</span></div>
+        <pre><span class="comment"># Assets with SPEED >= 50</span>
+?<span class="key">attributesearch</span>=[<span class="str">SPEED:>=50</span>]
+
+<span class="comment"># Assets that have SPEED attribute at all</span>
+?<span class="key">attributesearch</span>=[<span class="str">SPEED</span>]
+
+<span class="comment"># Multiple attributes (ANDed)</span>
+?<span class="key">attributesearch</span>=[<span class="str">SPEED:>=50;AREA;ELEV:=300</span>]</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>SynonymDomain Internal Value Filter</h3>
+        <div class="endpoint">/oslc/os/mxapiwodetail?<span class="query-param">domaininternalwhere=status=APPR,INPRG</span></div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Filter by internal domain values (base Maximo values, not customer-translated external values). Independent of <code>oslc.where</code>, ANDed to it if both present.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span>Examples</span></div>
+        <pre><span class="comment"># WOs with status = APPR or INPRG (internal values)</span>
+?<span class="key">domaininternalwhere</span>=status=<span class="str">APPR,INPRG</span>
+
+<span class="comment"># WOs NOT in APPR or INPRG</span>
+?<span class="key">domaininternalwhere</span>=status!=<span class="str">APPR,INPRG</span></pre>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ======================== SORT / PAGING ======================== -->
+<div class="section" id="sort">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2>Sorting & Paging</h2>
+  </div>
+
+  <div class="grid-2">
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="method GET">GET</span>
+        <div class="api-title">
+          <h3>Sort Results</h3>
+          <div class="endpoint">/oslc/os/mxapiasset?<span class="query-param">oslc.orderBy=-attr1,%2Battr2</span></div>
+        </div>
+      </div>
+      <div class="api-card-body">
+        <p class="api-desc">Prefix <code>-</code> for descending, <code>+</code> for ascending. URL-encode <code>+</code> as <code>%2B</code>.</p>
+        <div class="code-block">
+          <div class="code-block-header"><span>Example</span></div>
+          <pre>?<span class="key">oslc.orderBy</span>=<span class="str">-assetnum,%2Bstatus</span></pre>
+        </div>
+      </div>
+    </div>
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="method GET">GET</span>
+        <div class="api-title">
+          <h3>Paging</h3>
+          <div class="endpoint">/oslc/os/mxapiasset?<span class="query-param">oslc.pageSize=10</span></div>
+        </div>
+      </div>
+      <div class="api-card-body">
+        <p class="api-desc">Response includes <code>nextPage</code>, <code>previousPage</code>, <code>pagenum</code>, optional <code>totalCount</code>/<code>totalPages</code>.</p>
+        <div class="code-block">
+          <div class="code-block-header"><span>Stable Paging</span></div>
+          <pre>?<span class="key">oslc.pageSize</span>=<span class="num">10</span>&<span class="key">stablepaging</span>=<span class="num">1</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note"><strong>Stable Paging:</strong> Retains MboSet in memory across pages (no repeated SQL). Pages expire after 5 minutes of inactivity or when set is fully paged. No backward navigation.</div>
+</div>
+
+<!-- ======================== CRUD ======================== -->
+<div class="section" id="crud">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2>Create & Update Resources</h2>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method POST">POST</span>
+      <div class="api-title">
+        <h3>Create a Resource</h3>
+        <div class="endpoint">/oslc/os/mxapiasset</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">POST to the collection URI. Response <code>Location</code> header contains the URI of the new record. Use <code>properties</code> header to return fields immediately.</p>
+      <div class="grid-2">
+        <div>
+          <div class="label">Basic Create</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>HTTP</span></div>
+            <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiasset</span>
+<span class="header">Content-Type:</span> application/json
+
+{
+  <span class="key">"assetnum"</span>: <span class="str">"ASSET1"</span>,
+  <span class="key">"siteid"</span>: <span class="str">"BEDFORD"</span>,
+  <span class="key">"description"</span>: <span class="str">"my first asset"</span>
+}</pre>
+          </div>
+        </div>
+        <div>
+          <div class="label">Create + Return Fields</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>HTTP</span></div>
+            <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiasset</span>
+<span class="header">properties:</span> assetnum,status
+
+{
+  <span class="key">"assetnum"</span>: <span class="str">"ASSET1"</span>,
+  <span class="key">"siteid"</span>: <span class="str">"BEDFORD"</span>,
+  <span class="key">"description"</span>: <span class="str">"my first asset"</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method PATCH">PATCH</span>
+      <div class="api-title">
+        <h3>Update a Resource</h3>
+        <div class="endpoint">/oslc/os/mxapiasset/<span class="path-param">{rest id}</span></div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Use <code>x-method-override: PATCH</code> on a POST. Only the supplied fields are updated.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span>HTTP</span></div>
+        <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiasset/{rest id}</span>
+<span class="header">x-method-override:</span> PATCH
+<span class="header">properties:</span> *
+
+{
+  <span class="key">"location"</span>: <span class="str">"BR300"</span>,
+  <span class="key">"description"</span>: <span class="str">"updated asset"</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method PATCH">PATCH</span>
+      <div class="api-title">
+        <h3>Add Child Objects (MERGE)</h3>
+        <div class="endpoint">/oslc/os/mxapiasset/<span class="path-param">{rest id}</span> — patchtype: MERGE</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc"><strong>MERGE</strong>: Matches existing children and updates them; creates new ones. Does NOT delete unmentioned children. <strong>PATCH (default)</strong>: Deletes all children not in the payload.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span>HTTP — MERGE</span></div>
+        <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiasset/{rest id}</span>
+<span class="header">x-method-override:</span> PATCH
+<span class="header">patchtype:</span> MERGE
+<span class="header">properties:</span> *
+
+{
+  <span class="key">"assetmeter"</span>: [
+    { <span class="key">"metername"</span>: <span class="str">"TEMP-F"</span>, <span class="key">"linearassetid"</span>: <span class="num">0</span> },
+    { <span class="key">"metername"</span>: <span class="str">"ABC"</span>, <span class="key">"linearassetid"</span>: <span class="num">0</span> }
+  ]
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method PATCH">PATCH</span>
+      <div class="api-title">
+        <h3>Update Child Objects (set meter reading)</h3>
+        <div class="endpoint">/oslc/os/mxapiasset/<span class="path-param">{rest id}</span></div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Include the child's primary key in the payload to identify which child to update. Or use the child <code>href</code> URI.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span>HTTP</span></div>
+        <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiasset/{rest id}</span>
+<span class="header">x-method-override:</span> PATCH
+<span class="header">patchtype:</span> MERGE
+
+{
+  <span class="key">"assetmeter"</span>: [
+    {
+      <span class="key">"metername"</span>: <span class="str">"TEMP-F"</span>,
+      <span class="key">"linearassetid"</span>: <span class="num">0</span>,
+      <span class="key">"newreading"</span>: <span class="str">"10"</span>
+    }
+  ]
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method PATCH">PATCH</span>
+      <div class="api-title">
+        <h3>Delete Child Object</h3>
+        <div class="endpoint">/oslc/os/mxapiasset/<span class="path-param">{rest id}</span> — _action: Delete</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <div class="grid-2">
+        <div>
+          <div class="label">Via _action in payload</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>HTTP</span></div>
+            <pre>{
+  <span class="key">"assetmeter"</span>: [
+    {
+      <span class="key">"metername"</span>: <span class="str">"TEMP-F"</span>,
+      <span class="key">"linearassetid"</span>: <span class="num">0</span>,
+      <span class="key">"_action"</span>: <span class="str">"Delete"</span>
+    }
+  ]
+}</pre>
+          </div>
+        </div>
+        <div>
+          <div class="label">Via HTTP DELETE on child localref</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>HTTP</span></div>
+            <pre><span class="kw">DELETE</span> <span class="url">&lt;assetmeter localuri&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ======================== DELETE ======================== -->
+<div class="section" id="delete">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2>Delete Resources</h2>
+  </div>
+
+  <div class="grid-2">
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="method DELETE">DELETE</span>
+        <div class="api-title">
+          <h3>Delete Resource (HTTP DELETE)</h3>
+          <div class="endpoint">/oslc/os/<span class="path-param">{os}</span>/<span class="path-param">{rest id}</span></div>
+        </div>
+      </div>
+      <div class="api-card-body">
+        <div class="code-block">
+          <div class="code-block-header"><span>HTTP</span></div>
+          <pre><span class="kw">DELETE</span> <span class="url">/oslc/os/mxapiasset/{rest id}</span></pre>
+        </div>
+      </div>
+    </div>
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="method POST">POST</span>
+        <div class="api-title">
+          <h3>Delete via POST (browser-safe)</h3>
+          <div class="endpoint">/oslc/os/<span class="path-param">{os}</span>/<span class="path-param">{rest id}</span></div>
+        </div>
+      </div>
+      <div class="api-card-body">
+        <div class="code-block">
+          <div class="code-block-header"><span>HTTP</span></div>
+          <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiasset/{rest id}</span>
+<span class="header">x-method-override:</span> PATCH
+{ <span class="key">"_action"</span>: <span class="str">"Delete"</span> }</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>Check if Resource Can Be Deleted</h3>
+        <div class="endpoint">/oslc/os/<span class="path-param">{os}</span>/<span class="path-param">{rest id}</span>?action=system:candelete</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Returns <code>200 OK</code> if the MBO can be deleted. Requires the application MBO to implement <code>canDelete()</code>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== BULK & SYNC ======================== -->
+<div class="section" id="bulk">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2>Bulk & Sync</h2>
+  </div>
+  <div class="note"><strong>Bulk:</strong> Send multiple create/update/delete operations in a single HTTP request against the collection URI with <code>_action</code> per record. <strong>Sync:</strong> Upsert semantics — creates if not found, updates if exists. Both use POST to the collection URI.</div>
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method POST">POST</span>
+      <div class="api-title">
+        <h3>Bulk Create/Update</h3>
+        <div class="endpoint">/oslc/os/mxapiasset</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <div class="code-block">
+        <div class="code-block-header"><span>HTTP</span></div>
+        <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiasset</span>
+<span class="header">x-method-override:</span> BULK
+
+[
+  { <span class="key">"assetnum"</span>: <span class="str">"A001"</span>, <span class="key">"siteid"</span>: <span class="str">"BEDFORD"</span>, <span class="key">"_action"</span>: <span class="str">"Create"</span> },
+  { <span class="key">"assetnum"</span>: <span class="str">"A002"</span>, <span class="key">"siteid"</span>: <span class="str">"BEDFORD"</span>, <span class="key">"_action"</span>: <span class="str">"Create"</span> }
+]</pre>
+      </div>
+    </div>
+  </div>
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method POST">POST</span>
+      <div class="api-title">
+        <h3>Sync (Upsert)</h3>
+        <div class="endpoint">/oslc/os/mxapiasset</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <div class="code-block">
+        <div class="code-block-header"><span>HTTP</span></div>
+        <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiasset</span>
+<span class="header">x-method-override:</span> SYNC
+
+{ <span class="key">"assetnum"</span>: <span class="str">"A001"</span>, <span class="key">"siteid"</span>: <span class="str">"BEDFORD"</span>, <span class="key">"description"</span>: <span class="str">"updated"</span> }</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== ACTIONS ======================== -->
+<div class="section" id="actions">
+  <div class="section-header">
+    <span class="section-num">10</span>
+    <h2>Actions</h2>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>List Allowed Actions on a Resource</h3>
+        <div class="endpoint">/oslc/os/mxapiwo?<span class="query-param">oslc.where=wonum="1001"&oslc.select=allowedactions</span></div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Returns all available WebMethod and script actions registered to the object structure.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span>HTTP</span></div>
+        <pre><span class="kw">GET</span> <span class="url">/oslc/os/mxapiwo</span>?oslc.where=wonum=<span class="str">"1001"</span>&oslc.select=allowedactions</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method PATCH">PATCH</span>
+      <div class="api-title">
+        <h3>Invoke a WebMethod Action</h3>
+        <div class="endpoint">/oslc/os/mxapiwo/<span class="path-param">{rest id}</span>?action=wsmethod:approve</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Invokes a service method (annotated with <code>@WebMethod</code>) on the resource. The MBO is derived from the URI.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span>HTTP</span></div>
+        <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiwo/{rest id}</span>?<span class="key">action</span>=wsmethod:approve
+<span class="header">x-method-override:</span> PATCH
+
+{ <span class="key">"memo"</span>: <span class="str">"Approved via REST API"</span> }</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method PATCH">PATCH</span>
+      <div class="api-title">
+        <h3>Invoke a Script Action</h3>
+        <div class="endpoint">/oslc/os/mxapiasset/<span class="path-param">{rest id}</span>?action=<span class="path-param">TEST</span></div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Invoke an automation script registered as an action on the object structure. Script name used as action name.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span>HTTP</span></div>
+        <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiasset/{rest id}</span>?<span class="key">action</span>=TEST
+<span class="header">x-method-override:</span> PATCH</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method PATCH">PATCH</span>
+      <div class="api-title">
+        <h3>Invoke a Workflow via Action</h3>
+        <div class="endpoint">/oslc/os/mxapiasset/<span class="path-param">{rest id}</span>?action=workflow:<span class="path-param">ABC</span></div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <div class="code-block">
+        <div class="code-block-header"><span>HTTP</span></div>
+        <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiasset/{rest id}</span>?<span class="key">action</span>=workflow:ABC
+<span class="header">x-method-override:</span> PATCH</pre>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ======================== SCRIPTS ======================== -->
+<div class="section" id="scripts">
+  <div class="section-header">
+    <span class="section-num">11</span>
+    <h2>Automation Scripts (Custom APIs)</h2>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>Call a Custom Script API</h3>
+        <div class="endpoint">/oslc/script/<span class="path-param">countofwoandsr</span>?site=ABC</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Automation scripts can expose custom REST endpoints. Any HTTP method can be used. The script handles input via <code>request.getQueryParam()</code> and sets the JSON response object.</p>
+      <div class="grid-2">
+        <div>
+          <div class="label">Script (JavaScript)</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>Automation Script</span></div>
+            <pre><span class="kw">importPackage</span>(Packages.psdi.server);
+<span class="kw">var</span> resp = {};
+<span class="kw">var</span> site = request.getQueryParam(<span class="str">"site"</span>);
+<span class="kw">var</span> woset = MXServer.getMXServer()
+  .getMboSet(<span class="str">"workorder"</span>, request.getUserInfo());
+woset.setQbe(<span class="str">"siteid"</span>, <span class="str">"="</span>+site);
+resp.wocount = woset.count();
+<span class="comment">// ... set srcount similarly</span>
+resp.total = resp.wocount + resp.srcount;</pre>
+          </div>
+        </div>
+        <div>
+          <div class="label">Response</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>JSON</span></div>
+            <pre>{
+  <span class="key">"wocount"</span>: <span class="num">100</span>,
+  <span class="key">"srcount"</span>: <span class="num">20</span>,
+  <span class="key">"total"</span>: <span class="num">120</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ======================== ATTACHMENTS ======================== -->
+<div class="section" id="attachments">
+  <div class="section-header">
+    <span class="section-num">12</span>
+    <h2>Attachments</h2>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>List Attachments for a Resource</h3>
+        <div class="endpoint">/oslc/os/mxapiasset/<span class="path-param">{rest id}</span>/doclinks</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <div class="code-block">
+        <div class="code-block-header"><span>HTTP</span></div>
+        <pre><span class="comment"># Step 1: Get asset — see doclinks href in response</span>
+<span class="kw">GET</span> <span class="url">/oslc/os/mxapiasset/{rest id}</span>?lean=<span class="num">1</span>
+
+<span class="comment"># Step 2: Get the list of attachments</span>
+<span class="kw">GET</span> <span class="url">/oslc/os/mxapiasset/{rest id}/doclinks</span>?lean=<span class="num">1</span>
+
+<span class="comment"># Step 3: Download actual file</span>
+<span class="kw">GET</span> <span class="url">/oslc/os/mxapiasset/{rest id}/doclinks/{id}</span>
+
+<span class="comment"># Get metadata only</span>
+<span class="kw">GET</span> <span class="url">/oslc/os/mxapiasset/{rest id}/doclinks/meta/{id}</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method POST">POST</span>
+      <div class="api-title">
+        <h3>Upload File Attachment</h3>
+        <div class="endpoint">/oslc/os/mxapiasset/<span class="path-param">{rest id}</span>/doclinks</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <div class="label">Request Headers</div>
+      <table class="params-table">
+        <thead><tr><th>Header</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>slug</td><td>File name (ASCII)</td></tr>
+          <tr><td>encslug</td><td>File name base64-encoded (non-ASCII safe)</td></tr>
+          <tr><td>Content-Type</td><td>MIME type (e.g. text/plain, image/png)</td></tr>
+          <tr><td>x-document-meta</td><td>FILE/Attachments or URL/Attachments</td></tr>
+          <tr><td>x-document-description</td><td>Document description</td></tr>
+          <tr><td>custom-encoding</td><td>base64 (if body is base64 encoded)</td></tr>
+        </tbody>
+      </table>
+      <div class="grid-2">
+        <div>
+          <div class="label">Upload a text file</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>HTTP</span></div>
+            <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiasset/{rest id}/doclinks</span>
+<span class="header">x-document-meta:</span> FILE/Attachments
+<span class="header">slug:</span> test.txt
+<span class="header">x-document-description:</span> test file
+
+Hello this is my first test file</pre>
+          </div>
+        </div>
+        <div>
+          <div class="label">Attach URL (WWW)</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>HTTP</span></div>
+            <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiasset/{rest id}/doclinks</span>
+<span class="header">x-document-meta:</span> URL/Attachments
+<span class="header">slug:</span> CNN
+<span class="header">content-location:</span> www.cnn.com
+<span class="header">x-document-description:</span> cnn website</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method POST">POST</span>
+      <div class="api-title">
+        <h3>Create Asset with Attachment Inline</h3>
+        <div class="endpoint">/oslc/os/mxapiasset</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <div class="code-block">
+        <div class="code-block-header"><span>JSON Body</span></div>
+        <pre>{
+  <span class="key">"assetnum"</span>: <span class="str">"TEST299"</span>,
+  <span class="key">"siteid"</span>: <span class="str">"BEDFORD"</span>,
+  <span class="key">"doclinks"</span>: [
+    {
+      <span class="key">"urltype"</span>: <span class="str">"FILE"</span>,
+      <span class="key">"documentdata"</span>: <span class="str">"aGV5IGhvdyBhcmUgeW91"</span>,  <span class="comment">// base64 encoded</span>
+      <span class="key">"doctype"</span>: <span class="str">"Attachments"</span>,
+      <span class="key">"urlname"</span>: <span class="str">"greetings.txt"</span>
+    },
+    {
+      <span class="key">"urltype"</span>: <span class="str">"URL"</span>,
+      <span class="key">"doctype"</span>: <span class="str">"Attachments"</span>,
+      <span class="key">"title"</span>: <span class="str">"ESPN"</span>,
+      <span class="key">"newurlname"</span>: <span class="str">"www.espn.com"</span>
+    }
+  ]
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="method DELETE">DELETE</span>
+        <div class="api-title">
+          <h3>Delete Attachment</h3>
+          <div class="endpoint">/doclinks/<span class="path-param">{id}</span></div>
+        </div>
+      </div>
+      <div class="api-card-body">
+        <div class="code-block">
+          <div class="code-block-header"><span>HTTP</span></div>
+          <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiasset/{rest id}/doclinks/80</span>
+<span class="header">x-method-override:</span> DELETE</pre>
+        </div>
+      </div>
+    </div>
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="method GET">GET</span>
+        <div class="api-title">
+          <h3>Inline Attachments in Response</h3>
+          <div class="endpoint">/oslc/os/mxapiasset/<span class="path-param">{rest id}</span>?inlinedoc=1</div>
+        </div>
+      </div>
+      <div class="api-card-body">
+        <p class="api-desc">Returns attachment document data base64 encoded directly inside the JSON response.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ======================== WORKFLOW ======================== -->
+<div class="section" id="workflow">
+  <div class="section-header">
+    <span class="section-num">13</span>
+    <h2>Workflow Engine</h2>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method PATCH">PATCH</span>
+      <div class="api-title">
+        <h3>Initiate a Workflow</h3>
+        <div class="endpoint">/oslc/os/<span class="path-param">{os}</span>/<span class="path-param">{rest id}</span>?action=workflow:<span class="path-param">{name}</span></div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <div class="code-block">
+        <div class="code-block-header"><span>HTTP</span></div>
+        <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiasset/{rest id}</span>?<span class="key">action</span>=workflow:MYWORKFLOW
+<span class="header">x-method-override:</span> PATCH</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method GET">GET</span>
+      <div class="api-title">
+        <h3>Fetch Workflow Assignments</h3>
+        <div class="endpoint">/oslc/os/mxapiwfassignment?oslc.select=*</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Returns all workflow assignments for the authenticated user, including positive/negative action options.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span>Response Structure</span></div>
+        <pre>[
+  {
+    <span class="key">"wfassignmentid"</span>: <span class="str">"myid"</span>,
+    <span class="key">"description"</span>: <span class="str">"mydesc"</span>,
+    <span class="key">"wfaction"</span>: [
+      { <span class="key">"instruction"</span>: <span class="str">"Approve"</span>, <span class="key">"ispositive"</span>: <span class="kw">true</span> },
+      { <span class="key">"instruction"</span>: <span class="str">"Reject"</span>,  <span class="key">"ispositive"</span>: <span class="kw">false</span> }
+    ]
+  }
+]</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method POST">POST</span>
+      <div class="api-title">
+        <h3>Complete a Task Assignment</h3>
+        <div class="endpoint">/oslc/os/mxapiwfassignment/<span class="path-param">{id}</span>?action=wsmethod:completeAssignment</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <div class="grid-2">
+        <div>
+          <div class="label">Accept (positive)</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>HTTP</span></div>
+            <pre><span class="kw">POST</span> <span class="url">/oslc/os/mxapiwfassignment/{id}</span>
+  ?action=wsmethod:completeAssignment
+<span class="header">x-method-override:</span> PATCH
+
+{
+  <span class="key">"memo"</span>: <span class="str">"Approved"</span>,
+  <span class="key">"accepted"</span>: <span class="kw">true</span>
+}</pre>
+          </div>
+        </div>
+        <div>
+          <div class="label">Reject (negative)</div>
+          <div class="code-block">
+            <div class="code-block-header"><span>HTTP</span></div>
+            <pre>{
+  <span class="key">"memo"</span>: <span class="str">"Rejected"</span>,
+  <span class="key">"accepted"</span>: <span class="kw">false</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method POST">POST</span>
+      <div class="api-title">
+        <h3>Respond to Input Node</h3>
+        <div class="endpoint">&lt;location URI from previous response&gt;</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Input nodes provide options. Client reads the JSON options, user picks one, then POSTs the selection to the <code>location</code> header URI.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span>HTTP</span></div>
+        <pre><span class="kw">POST</span> <span class="url">&lt;location uri&gt;</span>
+{
+  <span class="key">"actionid"</span>: <span class="str">"myactionid1"</span>,
+  <span class="key">"memo"</span>: <span class="str">"Selected option 1"</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-header">
+      <span class="method POST">POST</span>
+      <div class="api-title">
+        <h3>Complete Interaction Node</h3>
+        <div class="endpoint">&lt;location URI&gt;</div>
+      </div>
+    </div>
+    <div class="api-card-body">
+      <p class="api-desc">Signals to the workflow engine that the interaction is complete so it moves to the next node.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span>HTTP</span></div>
+        <pre><span class="kw">POST</span> <span class="url">&lt;location uri&gt;</span>
+{ <span class="key">"interactioncomplete"</span>: <span class="num">1</span> }</pre>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- QUICK REFERENCE CHEATSHEET -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">⚡</span>
+    <h2>Quick Reference Cheatsheet</h2>
+  </div>
+  <div class="code-block">
+    <div class="code-block-header"><span>All Key Endpoints at a Glance</span></div>
+    <pre><span class="comment">## AUTH</span>
+<span class="kw">POST</span>   /oslc/login                                  <span class="comment"># Login (MAXAUTH / BASIC / FORM)</span>
+<span class="kw">POST</span>   /oslc/apitoken/create                        <span class="comment"># Create API key</span>
+<span class="kw">POST</span>   /oslc/apitoken/revoke                        <span class="comment"># Revoke API key</span>
+<span class="kw">GET</span>    /oslc/logout                                 <span class="comment"># Logout</span>
+
+<span class="comment">## QUERY</span>
+<span class="kw">GET</span>    /oslc/os/{os}                                <span class="comment"># Get collection</span>
+<span class="kw">GET</span>    /oslc/os/{os}/{id}                           <span class="comment"># Get single record</span>
+<span class="kw">GET</span>    /oslc/os/{os}/{id}/{relation}                <span class="comment"># Traverse relationship</span>
+<span class="kw">GET</span>    /oslc/os/{os}?oslc.select=f1,f2             <span class="comment"># Select fields</span>
+<span class="kw">GET</span>    /oslc/os/{os}?oslc.where=status="APPR"      <span class="comment"># Filter</span>
+<span class="kw">GET</span>    /oslc/os/{os}?oslc.orderBy=-assetnum        <span class="comment"># Sort</span>
+<span class="kw">GET</span>    /oslc/os/{os}?oslc.pageSize=10              <span class="comment"># Paginate</span>
+<span class="kw">GET</span>    /oslc/os/{os}?count=1                        <span class="comment"># Count only</span>
+
+<span class="comment">## CRUD</span>
+<span class="kw">POST</span>   /oslc/os/{os}                                <span class="comment"># Create</span>
+<span class="kw">POST</span>   /oslc/os/{os}/{id} + x-method-override:PATCH <span class="comment"># Update</span>
+<span class="kw">DELETE</span> /oslc/os/{os}/{id}                           <span class="comment"># Delete</span>
+<span class="kw">POST</span>   /oslc/os/{os} + x-method-override:BULK       <span class="comment"># Bulk</span>
+<span class="kw">POST</span>   /oslc/os/{os} + x-method-override:SYNC       <span class="comment"># Sync/Upsert</span>
+
+<span class="comment">## ACTIONS</span>
+<span class="kw">POST</span>   /oslc/os/{os}/{id}?action=wsmethod:{name}    <span class="comment"># WebMethod action</span>
+<span class="kw">POST</span>   /oslc/os/{os}/{id}?action=workflow:{name}    <span class="comment"># Workflow action</span>
+<span class="kw">GET</span>    /oslc/script/{scriptName}?param=value        <span class="comment"># Custom script API</span>
+
+<span class="comment">## ATTACHMENTS</span>
+<span class="kw">GET</span>    /oslc/os/{os}/{id}/doclinks                  <span class="comment"># List attachments</span>
+<span class="kw">POST</span>   /oslc/os/{os}/{id}/doclinks                  <span class="comment"># Upload attachment</span>
+<span class="kw">GET</span>    /oslc/os/{os}/{id}/doclinks/{id}             <span class="comment"># Download file</span>
+<span class="kw">POST</span>   /oslc/os/{os}/{id}/doclinks/{id} + DELETE    <span class="comment"># Delete attachment</span>
+
+<span class="comment">## WORKFLOW</span>
+<span class="kw">GET</span>    /oslc/os/mxapiwfassignment?oslc.select=*     <span class="comment"># Get assignments</span>
+<span class="kw">POST</span>   /oslc/os/mxapiwfassignment/{id}?action=wsmethod:completeAssignment</pre>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+  IBM Maximo REST API Session Guide &nbsp;·&nbsp; Source: ibm-maximo-dev.github.io/maximo-restapi-documentation &nbsp;·&nbsp; Last updated: December 2023 &nbsp;·&nbsp; Prepared by Mohamed Ghareeb
+</footer>
+
+</body>
+</html>
