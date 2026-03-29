@@ -1,0 +1,2574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MaximoCRM — UI Prototype v2.4.1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────── */
+:root {
+  --primary:        #93C572;
+  --primary-dark:   #6fa34e;
+  --primary-light:  #e8f5e0;
+  --primary-mid:    #b8d99a;
+  --white:          #ffffff;
+  --gray-50:        #f8f9fa;
+  --gray-100:       #f1f3f4;
+  --gray-200:       #e8eaed;
+  --gray-300:       #dadce0;
+  --gray-500:       #9aa0a6;
+  --gray-700:       #5f6368;
+  --gray-900:       #202124;
+  --accent-blue:    #1a73e8;
+  --accent-amber:   #f29900;
+  --accent-red:     #d93025;
+  --accent-teal:    #137333;
+
+  --radius-card:    12px;
+  --radius-input:   8px;
+  --radius-pill:    20px;
+  --shadow-card:    0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-hover:   0 4px 12px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.08);
+}
+
+/* ─── RESET & BASE ──────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans',sans-serif;background:#e8eaed;color:var(--gray-900);font-size:14px;line-height:1.5}
+button{cursor:pointer;border:none;background:none;font-family:inherit}
+input,select,textarea{font-family:inherit}
+
+/* ─── PROTOTYPE SHELL ───────────────────────────────── */
+.proto-shell{display:flex;gap:0;min-height:100vh}
+.proto-sidebar{width:200px;background:#1a1a2e;color:#fff;padding:24px 16px;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
+.proto-sidebar h3{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9aa0a6;margin-bottom:12px}
+.proto-sidebar .app-brand{display:flex;align-items:center;gap:10px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.proto-sidebar .app-brand .logo-dot{width:32px;height:32px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+.proto-sidebar .app-brand span{font-size:15px;font-weight:600}
+.nav-item{display:block;padding:9px 12px;border-radius:8px;color:#c8c8d4;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;margin-bottom:2px;border:none;background:none;text-align:left;width:100%}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav-item.active{background:rgba(147,197,114,.15);color:var(--primary)}
+.nav-dot{width:7px;height:7px;border-radius:50%;background:var(--primary);display:inline-block;margin-right:8px}
+
+.proto-content{flex:1;padding:32px;overflow-x:auto}
+.screen-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:8px}
+.screen-title{font-size:22px;font-weight:600;color:var(--gray-900);margin-bottom:4px;letter-spacing:-.02em}
+.screen-subtitle{font-size:13px;color:var(--gray-500);margin-bottom:24px}
+
+/* ─── PHONE FRAME ───────────────────────────────────── */
+.phone-frame{width:390px;min-height:844px;background:#fff;border-radius:44px;box-shadow:0 0 0 12px #111,0 0 0 14px #333,0 32px 64px rgba(0,0,0,.35);overflow:hidden;position:relative;display:none}
+.phone-frame.active{display:block}
+.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#111;border-radius:0 0 20px 20px;z-index:100}
+.phone-screen{height:844px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.phone-screen::-webkit-scrollbar{display:none}
+
+/* ─── STATUS BAR ────────────────────────────────────── */
+.status-bar{height:50px;padding:12px 24px 0;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;position:relative;z-index:10}
+.status-bar.light{color:#fff}
+.status-bar.dark{color:var(--gray-900)}
+.status-right{display:flex;align-items:center;gap:6px}
+
+/* ─── SCREENS ───────────────────────────────────────── */
+
+/* LOGIN */
+.login-screen{background:linear-gradient(160deg,#1a2e1a 0%,#0d1f0d 60%,#111 100%);height:100%;display:flex;flex-direction:column;padding:0 24px 32px}
+.login-logo-area{flex:0 0 auto;padding:80px 0 32px;text-align:center}
+.login-logo{width:80px;height:80px;background:var(--primary);border-radius:22px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(147,197,114,.4)}
+.login-logo svg{width:44px;height:44px}
+.login-appname{font-size:26px;font-weight:700;color:#fff;letter-spacing:-.02em}
+.login-sub{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:4px;font-family:'IBM Plex Mono',monospace}
+.login-form{flex:1;display:flex;flex-direction:column;gap:12px}
+.field-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px}
+.field-wrap{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:var(--radius-input);padding:14px 16px;display:flex;align-items:center;gap:10px;transition:border-color .2s}
+.field-wrap:focus-within{border-color:var(--primary)}
+.field-wrap input,.field-wrap select{background:none;border:none;outline:none;color:#fff;font-size:14px;flex:1}
+.field-wrap input::placeholder{color:rgba(255,255,255,.3)}
+.field-wrap input[type=password]{font-family:'IBM Plex Mono',monospace;letter-spacing:.08em}
+.field-wrap select{color:rgba(255,255,255,.7)}
+.field-wrap select option{background:#1a2e1a;color:#fff}
+.field-icon{opacity:.4;flex-shrink:0}
+.login-btn{background:var(--primary);color:#fff;font-size:15px;font-weight:600;border-radius:var(--radius-input);padding:16px;text-align:center;margin-top:4px;letter-spacing:.01em;box-shadow:0 4px 16px rgba(147,197,114,.35);transition:all .2s}
+.login-btn:hover{background:var(--primary-dark);transform:translateY(-1px)}
+.login-security{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:16px;font-size:11px;color:rgba(255,255,255,.3)}
+.login-footer{text-align:center;font-size:10px;color:rgba(255,255,255,.2);font-family:'IBM Plex Mono',monospace;line-height:1.8;margin-top:16px}
+
+/* HEADER BAND */
+.green-header{background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary) 100%);padding:16px 20px 24px;position:relative;overflow:hidden}
+.green-header::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:rgba(255,255,255,.06);border-radius:50%}
+.green-header::after{content:'';position:absolute;bottom:-60px;left:-20px;width:120px;height:120px;background:rgba(255,255,255,.04);border-radius:50%}
+.header-greeting{font-size:12px;color:rgba(255,255,255,.7);font-weight:500}
+.header-name{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.02em;margin-top:2px}
+.header-meta{font-size:11px;color:rgba(255,255,255,.6);font-family:'IBM Plex Mono',monospace;margin-top:4px}
+.header-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border-radius:var(--radius-pill);padding:4px 10px;font-size:11px;color:rgba(255,255,255,.9);font-weight:500;margin-top:8px;backdrop-filter:blur(8px)}
+
+/* METRIC CARDS GRID */
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 16px 8px}
+.metric-card{background:var(--white);border-radius:var(--radius-card);padding:14px;box-shadow:var(--shadow-card);transition:all .2s;cursor:pointer;position:relative;overflow:hidden}
+.metric-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover)}
+.metric-icon-wrap{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;flex-shrink:0}
+.metric-icon-wrap.green{background:#e8f5e0}
+.metric-icon-wrap.amber{background:#fff8e6}
+.metric-icon-wrap.blue{background:#e8f0fd}
+.metric-icon-wrap.red{background:#fce8e8}
+.metric-value{font-size:26px;font-weight:700;color:var(--gray-900);letter-spacing:-.03em;line-height:1}
+.metric-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--gray-500);margin-top:4px}
+.metric-badge{display:inline-block;border-radius:var(--radius-pill);padding:3px 8px;font-size:10px;font-weight:600;margin-top:8px}
+.metric-badge.green{background:#e8f5e0;color:#137333}
+.metric-badge.amber{background:#fff3d0;color:#b25c00}
+.metric-badge.blue{background:#e8f0fd;color:#1557b0}
+.metric-badge.red{background:#fce8e8;color:#a50e0e}
+
+/* STATUS PILL */
+.status-pill{display:inline-flex;align-items:center;border-radius:var(--radius-pill);padding:3px 10px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill-INPRG{background:#e8f0fd;color:#1557b0}
+.pill-WAPPR{background:#fff3d0;color:#b25c00}
+.pill-RESOLVED,.pill-APPROVED,.pill-PAID{background:#e8f5e0;color:#6fa34e}
+.pill-NEW,.pill-ALERT,.pill-REJECTED{background:#fce8e8;color:#a50e0e}
+.pill-OVERDUE{background:#fce8e8;color:#a50e0e}
+.pill-DRAFT,.pill-PENDING{background:#f1f3f4;color:#5f6368}
+.pill-REVIEW{background:#e8f0fd;color:#1557b0}
+.pill-SUBMITTED{background:#fff3d0;color:#b25c00}
+.pill-ACTIVE{background:#e8f5e0;color:#137333}
+.pill-EXPIRED{background:#f1f3f4;color:#5f6368}
+
+/* QUICK ACTIONS */
+.quick-actions{display:flex;gap:8px;padding:8px 16px 12px;overflow-x:auto;scrollbar-width:none}
+.quick-actions::-webkit-scrollbar{display:none}
+.qa-btn{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 14px;background:var(--white);border-radius:var(--radius-card);box-shadow:var(--shadow-card);cursor:pointer;transition:all .2s;min-width:70px}
+.qa-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover)}
+.qa-icon{width:36px;height:36px;background:var(--primary-light);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.qa-label{font-size:10px;font-weight:600;color:var(--gray-700);text-align:center;line-height:1.2}
+
+/* SECTIONS */
+.section-header{display:flex;justify-content:space-between;align-items:center;padding:8px 16px 4px}
+.section-title{font-size:13px;font-weight:600;color:var(--gray-900);letter-spacing:-.01em}
+.section-see-all{font-size:12px;color:var(--primary-dark);font-weight:500}
+.api-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;background:var(--gray-100);color:var(--gray-500);padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle}
+
+/* NOTIFICATION ITEMS */
+.notif-list{padding:0 16px;display:flex;flex-direction:column;gap:8px}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--white);border-radius:var(--radius-card);box-shadow:var(--shadow-card);cursor:pointer;transition:all .2s}
+.notif-item:hover{transform:translateX(2px)}
+.notif-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.notif-dot.green{background:var(--primary)}
+.notif-dot.amber{background:var(--accent-amber)}
+.notif-dot.red{background:var(--accent-red)}
+.notif-dot.blue{background:var(--accent-blue)}
+.notif-body{flex:1}
+.notif-title{font-size:12px;font-weight:600;color:var(--gray-900)}
+.notif-meta{font-size:11px;color:var(--gray-500);margin-top:2px}
+.notif-time{font-size:10px;color:var(--gray-500)}
+
+/* SEARCH BAR */
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--white);border-radius:var(--radius-input);padding:10px 14px;margin:12px 16px 8px;box-shadow:var(--shadow-card)}
+.search-bar input{flex:1;border:none;outline:none;font-size:13px;color:var(--gray-900)}
+.search-bar input::placeholder{color:var(--gray-500)}
+
+/* CHIP FILTERS */
+.chip-row{display:flex;gap:6px;padding:0 16px 8px;overflow-x:auto;scrollbar-width:none}
+.chip-row::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border-radius:var(--radius-pill);padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;border:1.5px solid var(--gray-300);color:var(--gray-700);background:var(--white)}
+.chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.chip-count{font-size:10px;opacity:.7;margin-left:4px}
+
+/* LIST CARDS */
+.list-area{padding:4px 16px 120px;display:flex;flex-direction:column;gap:10px}
+.list-card{background:var(--white);border-radius:var(--radius-card);padding:14px;box-shadow:var(--shadow-card);cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.list-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-hover)}
+.list-card.border-red{border-left:3.5px solid var(--accent-red)}
+.list-card.border-amber{border-left:3.5px solid var(--accent-amber)}
+.list-card.border-green{border-left:3.5px solid var(--primary)}
+.list-card.border-blue{border-left:3.5px solid var(--accent-blue)}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.card-id{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--gray-500);display:flex;align-items:center;gap:6px}
+.card-title{font-size:13px;font-weight:600;color:var(--gray-900);margin-bottom:3px;line-height:1.3}
+.card-desc{font-size:12px;color:var(--gray-700);line-height:1.4;margin-bottom:10px}
+.card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.card-footer-left{font-size:11px;color:var(--gray-500)}
+.card-footer-right{font-size:11px;color:var(--gray-700);font-weight:500}
+
+/* STATUS TIMELINE */
+.timeline{display:flex;align-items:center;padding:8px 0 6px;margin-bottom:2px}
+.tl-step{display:flex;flex-direction:column;align-items:center;position:relative}
+.tl-dot{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;z-index:1}
+.tl-dot.done{background:var(--primary);color:#fff}
+.tl-dot.active{background:var(--accent-blue);color:#fff;box-shadow:0 0 0 4px rgba(26,115,232,.15)}
+.tl-dot.pending{background:var(--gray-200);color:var(--gray-500)}
+.tl-label{font-size:8px;color:var(--gray-500);margin-top:3px;white-space:nowrap;font-weight:500}
+.tl-line{height:2px;flex:1;margin:0 2px;margin-bottom:12px}
+.tl-line.done{background:var(--primary)}
+.tl-line.pending{background:var(--gray-200)}
+
+/* WORKFLOW VISUALIZER */
+.workflow{padding:10px 0 4px}
+.wf-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:0;position:relative}
+.wf-step:not(:last-child)::after{content:'';position:absolute;left:13px;top:26px;bottom:-8px;width:1.5px;background:var(--gray-200);border-style:dashed}
+.wf-circle{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;z-index:1}
+.wf-circle.done{background:var(--primary);color:#fff;border:2px solid var(--primary-dark)}
+.wf-circle.active{background:var(--accent-blue);color:#fff;box-shadow:0 0 0 4px rgba(26,115,232,.15)}
+.wf-circle.pending{background:var(--white);border:2px solid var(--gray-300);color:var(--gray-500)}
+.wf-body{flex:1;padding-bottom:16px}
+.wf-title{font-size:12px;font-weight:600;color:var(--gray-900)}
+.wf-detail{font-size:10px;color:var(--gray-500);margin-top:2px}
+.wf-state-icon{font-size:11px}
+
+/* FAB */
+.fab{position:fixed;bottom:90px;right:24px;width:52px;height:52px;background:var(--primary);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(147,197,114,.45);cursor:pointer;transition:all .2s;font-size:24px;color:#fff;z-index:50}
+.fab:hover{transform:scale(1.06)}
+.fab-relative{position:absolute;bottom:80px;right:16px;width:48px;height:48px;background:var(--primary);border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(147,197,114,.4);cursor:pointer;font-size:22px;color:#fff;transition:all .2s}
+
+/* BOTTOM NAV */
+.bottom-nav{position:sticky;bottom:0;background:var(--white);border-top:1px solid var(--gray-200);display:flex;z-index:50;padding-bottom:8px}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 0 4px;cursor:pointer;transition:color .2s}
+.bn-icon{font-size:22px}
+.bn-label{font-size:10px;font-weight:600}
+.bn-item.active .bn-icon,.bn-item.active .bn-label{color:var(--primary)}
+.bn-item:not(.active) .bn-icon,.bn-item:not(.active) .bn-label{color:var(--gray-500)}
+
+/* BILLING */
+.billing-header{background:linear-gradient(135deg,#137333 0%,var(--primary-dark) 100%);padding:16px 20px 32px;position:relative;overflow:hidden}
+.billing-header::before{content:'';position:absolute;top:-50px;right:-30px;width:180px;height:180px;background:rgba(255,255,255,.05);border-radius:50%}
+.billing-balance{font-size:36px;font-weight:700;color:#fff;letter-spacing:-.03em;margin-top:8px}
+.billing-sub-label{font-size:12px;color:rgba(255,255,255,.7);margin-top:4px}
+.billing-stats{display:flex;gap:0;margin-top:16px}
+.billing-stat{flex:1;text-align:center;border-right:1px solid rgba(255,255,255,.15);padding:0 8px}
+.billing-stat:last-child{border-right:none}
+.billing-stat-val{font-size:18px;font-weight:700;color:#fff}
+.billing-stat-label{font-size:10px;color:rgba(255,255,255,.6);margin-top:2px}
+.pay-btn{background:#fff;color:var(--primary-dark);font-size:11px;font-weight:700;border-radius:var(--radius-pill);padding:5px 12px;letter-spacing:.03em}
+
+/* BAR CHART */
+.mini-chart{padding:12px 16px 8px;background:var(--white);margin:0 16px;border-radius:var(--radius-card);box-shadow:var(--shadow-card)}
+.chart-title{font-size:11px;font-weight:600;color:var(--gray-700);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em}
+.bars{display:flex;align-items:flex-end;gap:6px;height:56px}
+.bar{flex:1;border-radius:4px 4px 0 0;transition:height .3s}
+.bar.active,.bar.peak{background:var(--primary)}
+.bar.inactive{background:var(--primary-light)}
+.bar-labels{display:flex;gap:6px;margin-top:4px}
+.bar-label{flex:1;text-align:center;font-size:9px;color:var(--gray-500);font-family:'IBM Plex Mono',monospace}
+
+/* CLAIM APPROVED BANNER */
+.approved-banner{background:var(--primary-light);border-radius:8px;padding:10px 12px;margin:6px 0;display:flex;justify-content:space-between;align-items:center}
+.banner-amount{font-size:18px;font-weight:700;color:var(--primary-dark)}
+.banner-label{font-size:10px;color:var(--primary-dark);font-weight:500;margin-top:2px}
+.banner-claimed{font-size:12px;color:var(--gray-700)}
+.banner-claimed-sub{font-size:10px;color:var(--gray-500)}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--gray-300);border-radius:var(--radius-card);padding:16px;text-align:center;cursor:pointer;transition:all .2s;margin:4px 0}
+.upload-zone:hover{border-color:var(--primary);background:var(--primary-light)}
+.upload-icon{font-size:24px;margin-bottom:6px}
+.upload-text{font-size:12px;color:var(--gray-500)}
+.upload-sub{font-size:10px;color:var(--gray-500);margin-top:2px}
+
+/* PROFILE */
+.profile-header{background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary) 100%);padding:40px 20px 28px;text-align:center;position:relative;overflow:hidden}
+.avatar-circle{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.5);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#fff;backdrop-filter:blur(8px)}
+.profile-name{font-size:20px;font-weight:700;color:#fff}
+.profile-role{font-size:12px;color:rgba(255,255,255,.7);margin-top:2px}
+.profile-id{font-size:11px;color:rgba(255,255,255,.5);font-family:'IBM Plex Mono',monospace;margin-top:4px}
+
+.info-card{background:var(--white);border-radius:var(--radius-card);margin:12px 16px;box-shadow:var(--shadow-card);overflow:hidden}
+.info-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--gray-100)}
+.info-row:last-child{border-bottom:none}
+.info-icon{font-size:16px;opacity:.5;flex-shrink:0}
+.info-label{font-size:11px;color:var(--gray-500);font-weight:500}
+.info-value{font-size:13px;color:var(--gray-900);font-weight:500;font-family:'IBM Plex Mono',monospace;font-size:12px}
+
+.settings-section{margin:8px 16px}
+.settings-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-500);margin-bottom:8px;padding:0 4px}
+.settings-card{background:var(--white);border-radius:var(--radius-card);box-shadow:var(--shadow-card);overflow:hidden}
+.settings-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--gray-100);cursor:pointer}
+.settings-row:last-child{border-bottom:none}
+.settings-row-icon{font-size:16px;flex-shrink:0}
+.settings-row-text{flex:1}
+.settings-row-title{font-size:13px;font-weight:500;color:var(--gray-900)}
+.settings-row-sub{font-size:11px;color:var(--gray-500);margin-top:1px}
+.toggle{width:40px;height:22px;background:var(--gray-300);border-radius:11px;position:relative;flex-shrink:0;transition:background .2s}
+.toggle.on{background:var(--primary)}
+.toggle::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on::after{left:21px}
+.settings-arrow{color:var(--gray-300);font-size:16px}
+.signout-row{padding:13px 16px;text-align:center;color:var(--accent-red);font-size:14px;font-weight:600;cursor:pointer}
+.profile-footer{text-align:center;padding:16px;font-size:10px;color:var(--gray-500);font-family:'IBM Plex Mono',monospace;line-height:1.8}
+
+/* FORM FIELDS */
+.form-section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);padding:16px 16px 8px;display:flex;align-items:center;gap:8px}
+.form-section-label::after{content:'';flex:1;height:1px;background:var(--gray-200)}
+.form-body{padding:0 16px;display:flex;flex-direction:column;gap:10px}
+.form-field{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--gray-700)}
+.form-input{background:var(--white);border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 14px;font-size:13px;color:var(--gray-900);outline:none;transition:border-color .2s;font-family:'IBM Plex Sans',sans-serif}
+.form-input:focus{border-color:var(--primary)}
+.form-input::placeholder{color:var(--gray-300)}
+.form-select{appearance:none;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa0a6' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 12px center;border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 32px 11px 14px;font-size:13px;color:var(--gray-900);outline:none}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.info-banner{background:var(--primary-light);border:1px solid var(--primary-mid);border-radius:var(--radius-input);padding:10px 12px;margin:8px 16px;font-size:11px;color:var(--primary-dark);display:flex;gap:8px;line-height:1.5}
+.primary-btn{background:var(--primary);color:#fff;font-size:14px;font-weight:600;border-radius:var(--radius-input);padding:14px 16px;text-align:center;margin:12px 16px 0;display:block;transition:all .2s;box-shadow:0 2px 8px rgba(147,197,114,.3)}
+.secondary-btn{background:var(--white);color:var(--primary-dark);font-size:14px;font-weight:600;border-radius:var(--radius-input);padding:14px 16px;text-align:center;margin:8px 16px 0;display:block;border:1.5px solid var(--primary);transition:all .2s}
+.permit-type-row{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 8px}
+.ptype-chip{border-radius:var(--radius-pill);padding:5px 11px;font-size:10px;font-weight:600;border:1.5px solid var(--gray-300);color:var(--gray-700);cursor:pointer;transition:all .2s}
+.ptype-chip.selected{background:var(--accent-amber);border-color:var(--accent-amber);color:#fff}
+.ptype-chip.HOTWORK.selected{background:#d93025;border-color:#d93025}
+.ptype-chip.ACCESS.selected{background:var(--accent-blue);border-color:var(--accent-blue)}
+.ptype-chip.ELECTRICAL.selected{background:#f29900;border-color:#f29900}
+
+/* SCREEN HEADER BAR */
+.screen-header{display:flex;align-items:center;gap:12px;padding:8px 16px 4px;position:sticky;top:0;background:var(--gray-50);z-index:20}
+.back-btn{width:34px;height:34px;border-radius:10px;background:var(--white);box-shadow:var(--shadow-card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--gray-700);flex-shrink:0}
+.screen-header-title{font-size:16px;font-weight:600;color:var(--gray-900);flex:1;letter-spacing:-.01em}
+.screen-header-action{width:34px;height:34px;border-radius:10px;background:var(--white);box-shadow:var(--shadow-card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--gray-700)}
+
+/* ANIMATIONS */
+@keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(26,115,232,.4)}70%{box-shadow:0 0 0 6px rgba(26,115,232,0)}100%{box-shadow:0 0 0 0 rgba(26,115,232,0)}}
+.tl-dot.active{animation:pulse-ring 1.8s infinite}
+.wf-circle.active{animation:pulse-ring 1.8s infinite}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.phone-frame.active .list-card,.phone-frame.active .metric-card,.phone-frame.active .notif-item{animation:fadeInUp .35s ease backwards}
+.list-card:nth-child(1){animation-delay:.05s}
+.list-card:nth-child(2){animation-delay:.10s}
+.list-card:nth-child(3){animation-delay:.15s}
+.list-card:nth-child(4){animation-delay:.20s}
+
+/* SCROLLABLE CONTENT */
+.scroll-content{overflow-y:auto;overflow-x:hidden}
+
+/* SPACING */
+.spacer{height:12px}
+.pb-nav{padding-bottom:80px}
+</style>
+</head>
+<body>
+
+<div class="proto-shell">
+
+<!-- ─── SIDEBAR NAVIGATION ─────────────────────────── -->
+<div class="proto-sidebar">
+  <div class="app-brand">
+    <div class="logo-dot">M</div>
+    <span>MaximoCRM</span>
+  </div>
+  <div style="margin-bottom:6px">
+    <p class="proto-sidebar" style="font-size:9px;font-family:'IBM Plex Mono',monospace;color:rgba(255,255,255,.3);padding:0;margin-bottom:12px">UI PROTOTYPE v2.4.1</p>
+  </div>
+  <h3>Screens</h3>
+  <button id="nav-login" class="nav-item active" onclick="showScreen('login', this)"><span class="nav-dot"></span>Login</button>
+  <button id="nav-dashboard" class="nav-item" onclick="navTo('dashboard',this)"><span class="nav-dot"></span>Dashboard</button>
+  <button id="nav-sr" class="nav-item" onclick="navTo('service-requests',this)"><span class="nav-dot"></span>Service Requests</button>
+  <button id="nav-reg" class="nav-item" onclick="navTo('registration',this)"><span class="nav-dot"></span>Customer Registration</button>
+  <button id="nav-permits" class="nav-item" onclick="navTo('permits',this)"><span class="nav-dot"></span>Permits Management</button>
+  <button id="nav-claims" class="nav-item" onclick="navTo('claims',this)"><span class="nav-dot"></span>Claims Management</button>
+  <button id="nav-billing" class="nav-item" onclick="navTo('billing',this)"><span class="nav-dot"></span>Billing</button>
+  <button id="nav-profile" class="nav-item" onclick="navTo('profile',this)"><span class="nav-dot"></span>Profile & Settings</button>
+
+  <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08)">
+    <h3>Design Tokens</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">
+      <div style="width:24px;height:24px;border-radius:6px;background:#93C572" title="#93C572 Primary"></div>
+      <div style="width:24px;height:24px;border-radius:6px;background:#6fa34e" title="Primary Dark"></div>
+      <div style="width:24px;height:24px;border-radius:6px;background:#e8f5e0" title="Primary Light"></div>
+      <div style="width:24px;height:24px;border-radius:6px;background:#1a73e8" title="Accent Blue"></div>
+      <div style="width:24px;height:24px;border-radius:6px;background:#f29900" title="Accent Amber"></div>
+      <div style="width:24px;height:24px;border-radius:6px;background:#d93025" title="Accent Red"></div>
+      <div style="width:24px;height:24px;border-radius:6px;background:#137333" title="Accent Teal"></div>
+    </div>
+    <p style="font-size:9px;color:rgba(255,255,255,.25);margin-top:10px;font-family:'IBM Plex Mono',monospace">IBM Plex Sans + Plex Mono<br>OSLC REST / MIF API v7.6.1</p>
+  </div>
+</div>
+
+<!-- ─── MAIN CONTENT ───────────────────────────────── -->
+<div class="proto-content">
+
+  <!-- ══ SCREEN: LOGIN ══════════════════════════════ -->
+  <div id="screen-login">
+    <div class="screen-label">Screen 1 / 8</div>
+    <div class="screen-title">Login Screen</div>
+    <div class="screen-subtitle">Entry point — API key auth · Secure keychain storage · Environment selector</div>
+    <div class="phone-frame active">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="login-screen">
+          <div class="status-bar light">
+            <span>9:41</span>
+            <div class="status-right">
+              <span>●●●●</span><span>WiFi</span><span>🔋</span>
+            </div>
+          </div>
+          <div class="login-logo-area">
+            <div class="login-logo">
+              <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="10" width="14" height="14" rx="3" fill="white" opacity=".9"/>
+                <rect x="24" y="10" width="14" height="14" rx="3" fill="white" opacity=".6"/>
+                <rect x="6" y="28" width="14" height="8" rx="3" fill="white" opacity=".6"/>
+                <rect x="24" y="28" width="14" height="8" rx="3" fill="white" opacity=".9"/>
+              </svg>
+            </div>
+            <div class="login-appname">MaximoCRM</div>
+            <div class="login-sub">IBM Maximo 7.6.1 · Service Provider</div>
+          </div>
+          <div class="login-form">
+            <div>
+              <div class="field-label">Username / Customer ID</div>
+              <div class="field-wrap">
+                <span class="field-icon">👤</span>
+                <input type="email" placeholder="user@company.com" value="m.hassan@arabbanking.com">
+              </div>
+            </div>
+            <div>
+              <div class="field-label">API Key / Token</div>
+              <div class="field-wrap">
+                <span class="field-icon">🔑</span>
+                <input type="password" placeholder="API key from Maximo" value="mx_ak_9f3b2c1d4e5f">
+              </div>
+            </div>
+            <div>
+              <div class="field-label">Maximo Environment</div>
+              <div class="field-wrap">
+                <span class="field-icon">🌐</span>
+                <select>
+                  <option>Production — arabbanking.local</option>
+                  <option>Staging — maximo-stage.arabbanking.local</option>
+                </select>
+              </div>
+            </div>
+            <button class="login-btn">Sign In to Maximo</button>
+            <div class="login-security">
+              <span>🔒</span>
+              <span>Secured · API Key Auth · HTTPS / TLS 1.3</span>
+            </div>
+          </div>
+          <div class="login-footer">
+            IBM Maximo Integration Framework (MIF)<br>
+            OSLC REST API · Role-Based Access Control<br>
+            v2.4.1 · © 2024 MaximoCRM
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: DASHBOARD ══════════════════════════ -->
+  <div id="screen-dashboard" style="display:none">
+    <div class="screen-label">Screen 2 / 8</div>
+    <div class="screen-title">Dashboard</div>
+    <div class="screen-subtitle">Home overview — Metrics, quick actions, recent activity · Parallel API calls on load</div>
+    <div class="phone-frame active">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="status-bar light" style="position:absolute;width:100%;top:0;z-index:20">
+          <span style="color:#fff">9:41</span>
+          <div class="status-right" style="color:#fff"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
+        </div>
+        <div class="green-header" style="padding-top:52px">
+          <div class="header-greeting">Good morning,</div>
+          <div class="header-name">Mohamed Hassan</div>
+          <div class="header-meta">Arab Banking Corp · ACC-20255839</div>
+          <div class="header-badge"><span>🟢</span> Connected · mxsr, mxinvoice, mxpermit</div>
+        </div>
+        <!-- METRIC CARDS -->
+        <div class="metrics-grid">
+          <div class="metric-card" onclick="navTo('service-requests','nav-sr')">
+            <div class="metric-icon-wrap green">
+              <span style="font-size:18px">📋</span>
+            </div>
+            <div class="metric-value">14</div>
+            <div class="metric-label">Service Requests</div>
+            <div class="metric-badge amber">3 Awaiting</div>
+          </div>
+          <div class="metric-card" onclick="navTo('permits','nav-permits')">
+            <div class="metric-icon-wrap amber">
+              <span style="font-size:18px">📄</span>
+            </div>
+            <div class="metric-value">7</div>
+            <div class="metric-label">Permits</div>
+            <div class="metric-badge green">5 Approved</div>
+          </div>
+          <div class="metric-card" onclick="navTo('claims','nav-claims')">
+            <div class="metric-icon-wrap blue">
+              <span style="font-size:18px">🛡️</span>
+            </div>
+            <div class="metric-value">6</div>
+            <div class="metric-label">Claims</div>
+            <div class="metric-badge blue">2 Under Review</div>
+          </div>
+          <div class="metric-card" onclick="navTo('billing','nav-billing')">
+            <div class="metric-icon-wrap red">
+              <span style="font-size:18px">💰</span>
+            </div>
+            <div class="metric-value">$18.4K</div>
+            <div class="metric-label">Outstanding</div>
+            <div class="metric-badge red">2 Overdue</div>
+          </div>
+        </div>
+        <!-- QUICK ACTIONS -->
+        <div class="section-header"><div class="section-title">Quick Actions</div></div>
+        <div class="quick-actions">
+          <div class="qa-btn" onclick="openNewSRModal()">
+            <div class="qa-icon">➕</div>
+            <div class="qa-label">New SR</div>
+          </div>
+          <div class="qa-btn" onclick="openNewPermitModal()">
+            <div class="qa-icon">📄</div>
+            <div class="qa-label">Permit</div>
+          </div>
+          <div class="qa-btn" onclick="openNewClaimModal()">
+            <div class="qa-icon">🛡️</div>
+            <div class="qa-label">Claim</div>
+          </div>
+          <div class="qa-btn" onclick="openPayModal('INV-2024-089',1050)">
+            <div class="qa-icon">💳</div>
+            <div class="qa-label">Pay</div>
+          </div>
+        </div>
+        <!-- RECENT ACTIVITY -->
+        <div class="section-header" style="margin-top:8px">
+          <div class="section-title">Recent Activity</div>
+          <div class="section-see-all" onclick="navTo('service-requests','nav-sr')" style="cursor:pointer">See all →</div>
+        </div>
+        <div class="notif-list pb-nav">
+          <div class="notif-item" onclick="openSRDetail('SR-20240301')">
+            <div class="notif-dot green"></div>
+            <div class="notif-body">
+              <div class="notif-title">SR-20240312 — Resolved</div>
+              <div class="notif-meta">HVAC maintenance completed at Unit 4B</div>
+            </div>
+            <div class="notif-time">2h ago</div>
+          </div>
+          <div class="notif-item" onclick="navTo('permits','nav-permits')">
+            <div class="notif-dot amber"></div>
+            <div class="notif-body">
+              <div class="notif-title">WP-4421 — Awaiting Approval</div>
+              <div class="notif-meta">Hot Work Permit pending supervisor sign-off</div>
+            </div>
+            <div class="notif-time">5h ago</div>
+          </div>
+          <div class="notif-item" onclick="openInvoiceDetail('INV-2024-089')">
+            <div class="notif-dot red"></div>
+            <div class="notif-body">
+              <div class="notif-title">INV-2024-089 — Overdue</div>
+              <div class="notif-meta">$4,200.00 payment due 3 days ago</div>
+            </div>
+            <div class="notif-time">1d ago</div>
+          </div>
+          <div class="notif-item" onclick="navTo('claims','nav-claims')">
+            <div class="notif-dot blue"></div>
+            <div class="notif-body">
+              <div class="notif-title">CLM-042 — Under Review</div>
+              <div class="notif-meta">Equipment damage claim in assessment</div>
+            </div>
+            <div class="notif-time">2d ago</div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="bn-item active" id="dash-bn-home" onclick="navTo('dashboard','nav-dashboard')"><div class="bn-icon">🏠</div><div class="bn-label">Home</div></div>
+          <div class="bn-item" onclick="navTo('service-requests','nav-sr')"><div class="bn-icon">📋</div><div class="bn-label">Requests</div></div>
+          <div class="bn-item" onclick="navTo('billing','nav-billing')"><div class="bn-icon">💰</div><div class="bn-label">Billing</div></div>
+          <div class="bn-item" onclick="navTo('profile','nav-profile')"><div class="bn-icon">👤</div><div class="bn-label">Profile</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: SERVICE REQUESTS ═══════════════════ -->
+  <div id="screen-service-requests" style="display:none">
+    <div class="screen-label">Screen 3 / 8</div>
+    <div class="screen-title">Service Requests</div>
+    <div class="screen-subtitle">SR list with status timeline · Search · Chip filters · FAB to create</div>
+    <div class="phone-frame active">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" style="background:var(--gray-50)">
+        <div class="status-bar dark" style="background:var(--gray-50)">
+          <span>9:41</span>
+          <div class="status-right"><span>●●●●</span><span>🔋</span></div>
+        </div>
+        <div class="screen-header">
+          <div class="back-btn">←</div>
+          <div class="screen-header-title">Service Requests <span class="api-tag">/mxsr</span></div>
+          <div class="screen-header-action">⚙️</div>
+        </div>
+        <div class="search-bar">
+          <span style="font-size:16px;opacity:.4">🔍</span>
+          <input placeholder="Search by ticket ID or description…">
+        </div>
+        <div class="chip-row">
+          <div class="chip active">All <span class="chip-count">14</span></div>
+          <div class="chip">In Progress <span class="chip-count">5</span></div>
+          <div class="chip">Awaiting <span class="chip-count">3</span></div>
+          <div class="chip">Resolved <span class="chip-count">6</span></div>
+        </div>
+        <div class="list-area">
+          <!-- SR CARD 1 — INPRG -->
+          <div class="list-card border-blue" onclick="openSRDetail('SR-20240312')">
+            <div class="card-header">
+              <div>
+                <div class="card-id">SR-20240312 <span class="api-tag">MXSR</span></div>
+                <div class="card-title">HVAC System Maintenance — Office Floor 3</div>
+              </div>
+              <span class="status-pill pill-INPRG">INPRG</span>
+            </div>
+            <div class="card-desc">Routine HVAC servicing and filter replacement for the third floor cooling units.</div>
+            <div class="timeline">
+              <div class="tl-step"><div class="tl-dot done">✓</div><div class="tl-label">New</div></div>
+              <div class="tl-line done"></div>
+              <div class="tl-step"><div class="tl-dot done">✓</div><div class="tl-label">WAPPR</div></div>
+              <div class="tl-line done"></div>
+              <div class="tl-step"><div class="tl-dot active">▶</div><div class="tl-label">INPRG</div></div>
+              <div class="tl-line pending"></div>
+              <div class="tl-step"><div class="tl-dot pending">–</div><div class="tl-label">Comp</div></div>
+              <div class="tl-line pending"></div>
+              <div class="tl-step"><div class="tl-dot pending">–</div><div class="tl-label">Closed</div></div>
+            </div>
+            <div class="card-footer">
+              <div class="card-footer-left">Updated: Mar 21, 2024</div>
+              <div class="card-footer-right">Priority: 2 — Normal</div>
+            </div>
+          </div>
+          <!-- SR CARD 2 — WAPPR -->
+          <div class="list-card border-amber" onclick="openSRDetail('SR-20240308')">
+            <div class="card-header">
+              <div>
+                <div class="card-id">SR-20240308 <span class="api-tag">MXSR</span></div>
+                <div class="card-title">Electrical Panel Inspection — B1 Level</div>
+              </div>
+              <span class="status-pill pill-WAPPR">WAPPR</span>
+            </div>
+            <div class="card-desc">Annual electrical safety inspection for all distribution panels in basement level.</div>
+            <div class="timeline">
+              <div class="tl-step"><div class="tl-dot done">✓</div><div class="tl-label">New</div></div>
+              <div class="tl-line done"></div>
+              <div class="tl-step"><div class="tl-dot active">▶</div><div class="tl-label">WAPPR</div></div>
+              <div class="tl-line pending"></div>
+              <div class="tl-step"><div class="tl-dot pending">–</div><div class="tl-label">INPRG</div></div>
+              <div class="tl-line pending"></div>
+              <div class="tl-step"><div class="tl-dot pending">–</div><div class="tl-label">Comp</div></div>
+              <div class="tl-line pending"></div>
+              <div class="tl-step"><div class="tl-dot pending">–</div><div class="tl-label">Closed</div></div>
+            </div>
+            <div class="card-footer">
+              <div class="card-footer-left">Updated: Mar 20, 2024</div>
+              <div class="card-footer-right">Priority: 1 — High</div>
+            </div>
+          </div>
+          <!-- SR CARD 3 — RESOLVED -->
+          <div class="list-card border-green" onclick="openSRDetail('SR-20240301')">
+            <div class="card-header">
+              <div>
+                <div class="card-id">SR-20240301 <span class="api-tag">MXSR</span></div>
+                <div class="card-title">Water Leak — Server Room Ceiling</div>
+              </div>
+              <span class="status-pill pill-RESOLVED">RESOLVED</span>
+            </div>
+            <div class="card-desc">Emergency repair of ceiling water ingress above server rack area.</div>
+            <div class="timeline">
+              <div class="tl-step"><div class="tl-dot done">✓</div><div class="tl-label">New</div></div>
+              <div class="tl-line done"></div>
+              <div class="tl-step"><div class="tl-dot done">✓</div><div class="tl-label">WAPPR</div></div>
+              <div class="tl-line done"></div>
+              <div class="tl-step"><div class="tl-dot done">✓</div><div class="tl-label">INPRG</div></div>
+              <div class="tl-line done"></div>
+              <div class="tl-step"><div class="tl-dot done">✓</div><div class="tl-label">Comp</div></div>
+              <div class="tl-line done"></div>
+              <div class="tl-step"><div class="tl-dot done">✓</div><div class="tl-label">Closed</div></div>
+            </div>
+            <div class="card-footer">
+              <div class="card-footer-left">Closed: Mar 15, 2024</div>
+              <div class="card-footer-right">Priority: 1 — Critical</div>
+            </div>
+          </div>
+          <!-- SR CARD 4 — NEW -->
+          <div class="list-card border-red" onclick="openSRDetail('SR-20240322')">
+            <div class="card-header">
+              <div>
+                <div class="card-id">SR-20240322 <span class="api-tag">MXSR</span></div>
+                <div class="card-title">Generator Fuel Top-Up Request</div>
+              </div>
+              <span class="status-pill pill-NEW">NEW</span>
+            </div>
+            <div class="card-desc">Emergency generator diesel levels below 30% threshold. Refueling required.</div>
+            <div class="timeline">
+              <div class="tl-step"><div class="tl-dot active">▶</div><div class="tl-label">New</div></div>
+              <div class="tl-line pending"></div>
+              <div class="tl-step"><div class="tl-dot pending">–</div><div class="tl-label">WAPPR</div></div>
+              <div class="tl-line pending"></div>
+              <div class="tl-step"><div class="tl-dot pending">–</div><div class="tl-label">INPRG</div></div>
+              <div class="tl-line pending"></div>
+              <div class="tl-step"><div class="tl-dot pending">–</div><div class="tl-label">Comp</div></div>
+              <div class="tl-line pending"></div>
+              <div class="tl-step"><div class="tl-dot pending">–</div><div class="tl-label">Closed</div></div>
+            </div>
+            <div class="card-footer">
+              <div class="card-footer-left">Created: Mar 22, 2024</div>
+              <div class="card-footer-right">Priority: 1 — Urgent</div>
+            </div>
+          </div>
+        </div>
+        <div class="fab-relative" onclick="openNewSRModal()">+</div>
+        <div class="bottom-nav">
+          <div class="bn-item" onclick="navTo('dashboard','nav-dashboard')"><div class="bn-icon">🏠</div><div class="bn-label">Home</div></div>
+          <div class="bn-item active" onclick="navTo('service-requests','nav-sr')"><div class="bn-icon">📋</div><div class="bn-label">Requests</div></div>
+          <div class="bn-item" onclick="navTo('billing','nav-billing')"><div class="bn-icon">💰</div><div class="bn-label">Billing</div></div>
+          <div class="bn-item" onclick="navTo('profile','nav-profile')"><div class="bn-icon">👤</div><div class="bn-label">Profile</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="screen-registration" style="display:none">
+    <div class="screen-label">Screen 4 / 8</div>
+    <div class="screen-title">Customer Registration</div>
+    <div class="screen-subtitle">Creates PERSON + CUSTOMER records in Maximo via OSLC POST</div>
+    <div class="phone-frame active">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" style="background:var(--gray-50)">
+        <div class="status-bar dark" style="background:var(--gray-50)">
+          <span>9:41</span>
+          <div class="status-right"><span>●●●●</span><span>🔋</span></div>
+        </div>
+        <div class="screen-header">
+          <div class="back-btn">←</div>
+          <div class="screen-header-title">Customer Registration <span class="api-tag">/mxperson</span></div>
+          <div class="screen-header-action">💾</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="form-section-label">Personal Information</div>
+        <div class="form-body">
+          <div class="form-row">
+            <div class="form-field"><div class="form-label">First Name</div><input class="form-input" placeholder="Ahmed" value="Mohamed"></div>
+            <div class="form-field"><div class="form-label">Last Name</div><input class="form-input" placeholder="Hassan" value="Hassan"></div>
+          </div>
+          <div class="form-field"><div class="form-label">Email Address</div><input class="form-input" type="email" placeholder="user@company.com" value="m.hassan@arabbanking.com"></div>
+          <div class="form-row">
+            <div class="form-field"><div class="form-label">Phone</div><input class="form-input" placeholder="+20100000000" value="+97312345678"></div>
+            <div class="form-field"><div class="form-label">Mobile</div><input class="form-input" placeholder="+20100000000"></div>
+          </div>
+        </div>
+        <div class="form-section-label">Organization / Account</div>
+        <div class="form-body">
+          <div class="form-field"><div class="form-label">Company Name</div><input class="form-input" value="Arab Banking Corporation"></div>
+          <div class="form-row">
+            <div class="form-field">
+              <div class="form-label">Account Type</div>
+              <select class="form-input form-select">
+                <option>Service Provider</option>
+                <option>Contractor</option>
+                <option>Vendor</option>
+                <option>Internal</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <div class="form-label">Security Group</div>
+              <select class="form-input form-select">
+                <option>CUSTOMERGRP</option>
+                <option>READONLYGRP</option>
+                <option>SERVICEPRV</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="form-section-label">Address Details</div>
+        <div class="form-body">
+          <div class="form-field"><div class="form-label">Street Address</div><input class="form-input" value="P.O. Box 5698, Manama"></div>
+          <div class="form-row">
+            <div class="form-field"><div class="form-label">City</div><input class="form-input" value="Manama"></div>
+            <div class="form-field"><div class="form-label">Country</div><input class="form-input" value="Bahrain"></div>
+          </div>
+        </div>
+        <!-- LOCATION SECTION -->
+        <div class="form-section-label">Location</div>
+        <div class="form-body">
+          <div class="form-field">
+            <div class="form-label">Site Location Code <span style="color:var(--accent-red)">*</span></div>
+            <!-- Location picker card -->
+            <div id="reg-loc-card" onclick="openRegLocationModal()" style="background:var(--primary-light);border:1.5px solid var(--primary-mid);border-radius:var(--radius-input);padding:14px;cursor:pointer;transition:all .15s;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <span style="font-size:11px;font-weight:600;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.06em;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  Select Location
+                </span>
+                <span style="font-size:10px;color:var(--primary-dark);">Tap to choose →</span>
+              </div>
+              <!-- Code display -->
+              <div id="reg-loc-code-display" style="background:#fff;border:1.5px solid var(--primary-mid);border-radius:var(--radius-input);padding:10px 14px;font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:var(--primary-dark);letter-spacing:.06em;text-align:center;margin-bottom:12px;min-height:44px;display:flex;align-items:center;justify-content:center;">
+                <span id="reg-loc-part-project" style="color:var(--gray-300)">WVR</span><span style="color:var(--gray-300)" id="reg-loc-dash1">-</span><span id="reg-loc-part-zone" style="color:var(--gray-300)">Z1</span><span style="color:var(--gray-300)" id="reg-loc-dash2">-</span><span id="reg-loc-part-bldg" style="color:var(--gray-300)">001</span><span style="color:var(--gray-300)" id="reg-loc-dash3">-</span><span id="reg-loc-part-floor" style="color:var(--gray-300)">_</span><span style="color:var(--gray-300)" id="reg-loc-dash4">-</span><span id="reg-loc-part-apt" style="color:var(--gray-300)">__</span>
+              </div>
+              <!-- Segment chips -->
+              <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
+                <div style="display:flex;flex-direction:column;gap:3px;">
+                  <div style="font-size:9px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;text-align:center;">Project</div>
+                  <div id="reg-disp-project" style="padding:7px 4px;border:1.5px solid var(--gray-200);border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--gray-300);background:#fff;text-align:center;">–</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:3px;">
+                  <div style="font-size:9px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;text-align:center;">Zone</div>
+                  <div id="reg-disp-zone" style="padding:7px 4px;border:1.5px solid var(--gray-200);border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--gray-300);background:#fff;text-align:center;">–</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:3px;">
+                  <div style="font-size:9px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;text-align:center;">Building</div>
+                  <div id="reg-disp-bldg" style="padding:7px 4px;border:1.5px solid var(--gray-200);border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--gray-300);background:#fff;text-align:center;">–</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:3px;">
+                  <div style="font-size:9px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;text-align:center;">Floor</div>
+                  <div id="reg-disp-floor" style="padding:7px 4px;border:1.5px solid var(--gray-200);border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--gray-300);background:#fff;text-align:center;">–</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:3px;">
+                  <div style="font-size:9px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;text-align:center;">Unit</div>
+                  <div id="reg-disp-unit" style="padding:7px 4px;border:1.5px solid var(--gray-200);border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--gray-300);background:#fff;text-align:center;">–</div>
+                </div>
+              </div>
+              <!-- Name banner -->
+              <div id="reg-loc-name-banner" style="margin-top:10px;padding:8px 12px;background:var(--primary-dark);border-radius:var(--radius-input);display:none;align-items:center;gap:8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <div>
+                  <div id="reg-loc-name-text" style="font-size:12px;color:white;font-weight:500;line-height:1.3;"></div>
+                  <div id="reg-loc-name-sub" style="font-size:10px;color:rgba(255,255,255,.65);margin-top:1px;"></div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:6px;background:var(--primary-light);border:1px solid var(--primary-mid);border-left:3px solid var(--primary);border-radius:0 var(--radius-input) var(--radius-input) 0;padding:9px 12px;font-size:11px;color:var(--primary-dark);line-height:1.5;">
+              Location code auto-generated. Format: <strong style="font-family:'IBM Plex Mono',monospace;">PROJECT-ZONE-BLDG-FLOOR-UNIT</strong>
+            </div>
+          </div>
+          <!-- Site field (read-only, derived) -->
+          <div class="form-field">
+            <div class="form-label">Site</div>
+            <input class="form-input" type="text" id="reg-site-field" placeholder="Auto-filled from location" disabled style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.04em;background:var(--gray-50);color:var(--gray-500);">
+          </div>
+        </div>
+
+        <div class="info-banner">
+          <span>ℹ️</span>
+          <span>Maximo Sync: Record will be created in <strong>PERSON</strong> &amp; <strong>CUSTOMER</strong> objects via POST /oslc/os/mxperson then POST /oslc/os/mxcustomer</span>
+        </div>
+        <button class="primary-btn" onclick="showToast('✅ Maximo record created — MHASSAN')">Create Maximo Record</button>
+        <button class="secondary-btn" onclick="showToast('💾 Saved as draft')">Save as Draft</button>
+        <div style="height:32px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ NEW SERVICE REQUEST MODAL ═════════════════ -->
+  <div id="new-sr-modal" onclick="handleSRBackdropClick(event)" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:250;display:none;align-items:flex-end;justify-content:center;">
+    <div id="new-sr-sheet" onclick="event.stopPropagation()" style="background:#fff;border-radius:20px 20px 0 0;width:390px;max-height:90vh;overflow-y:auto;padding:0 0 32px;">
+      <!-- Sticky header -->
+      <div style="position:sticky;top:0;background:#fff;border-radius:20px 20px 0 0;padding:16px 20px 12px;border-bottom:1px solid var(--gray-200);z-index:10;">
+        <div style="width:40px;height:4px;background:var(--gray-200);border-radius:2px;margin:0 auto 14px;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--gray-900);">New Service Request</div>
+            <div style="font-size:11px;color:var(--gray-500);margin-top:2px;font-family:'IBM Plex Mono',monospace;">POST /oslc/os/mxsr</div>
+          </div>
+          <div id="sr-step-indicator" style="font-size:11px;font-weight:600;color:var(--gray-500);background:var(--gray-100);padding:4px 10px;border-radius:20px;">Step 1 / 3</div>
+        </div>
+        <!-- Progress dots -->
+        <div style="display:flex;gap:5px;margin-top:12px;">
+          <div id="sr-prog-1" style="flex:1;height:3px;border-radius:2px;background:var(--primary);transition:background .3s;"></div>
+          <div id="sr-prog-2" style="flex:1;height:3px;border-radius:2px;background:var(--gray-200);transition:background .3s;"></div>
+          <div id="sr-prog-3" style="flex:1;height:3px;border-radius:2px;background:var(--gray-200);transition:background .3s;"></div>
+        </div>
+      </div>
+
+      <!-- ── STEP 1: Department & Classification ── -->
+      <div id="sr-step-1" style="padding:20px 20px 0;">
+        <div style="font-size:12px;font-weight:700;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;">Department & Classification</div>
+
+        <!-- Department -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:600;color:var(--gray-700);letter-spacing:.04em;margin-bottom:8px;">Department <span style="color:var(--accent-red)">*</span></div>
+          <div id="sr-dept-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div class="sr-dept-opt" onclick="srSelectDept(this,'MECH','🔧','Mechanical')" style="padding:12px 10px;border:1.5px solid var(--gray-200);border-radius:10px;cursor:pointer;transition:all .15s;text-align:center;">
+              <div style="font-size:22px;margin-bottom:5px;">🔧</div>
+              <div style="font-size:12px;font-weight:600;color:var(--gray-700);">Mechanical</div>
+              <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">HVAC · Plumbing · Lifts</div>
+            </div>
+            <div class="sr-dept-opt" onclick="srSelectDept(this,'ELEC','⚡','Electrical')" style="padding:12px 10px;border:1.5px solid var(--gray-200);border-radius:10px;cursor:pointer;transition:all .15s;text-align:center;">
+              <div style="font-size:22px;margin-bottom:5px;">⚡</div>
+              <div style="font-size:12px;font-weight:600;color:var(--gray-700);">Electrical</div>
+              <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Panels · Lighting · UPS</div>
+            </div>
+            <div class="sr-dept-opt" onclick="srSelectDept(this,'CIVIL','🏗️','Civil')" style="padding:12px 10px;border:1.5px solid var(--gray-200);border-radius:10px;cursor:pointer;transition:all .15s;text-align:center;">
+              <div style="font-size:22px;margin-bottom:5px;">🏗️</div>
+              <div style="font-size:12px;font-weight:600;color:var(--gray-700);">Civil</div>
+              <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Structure · Waterproofing</div>
+            </div>
+            <div class="sr-dept-opt" onclick="srSelectDept(this,'SOFT','🌿','Soft Services')" style="padding:12px 10px;border:1.5px solid var(--gray-200);border-radius:10px;cursor:pointer;transition:all .15s;text-align:center;">
+              <div style="font-size:22px;margin-bottom:5px;">🌿</div>
+              <div style="font-size:12px;font-weight:600;color:var(--gray-700);">Soft Services</div>
+              <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Cleaning · Landscaping</div>
+            </div>
+            <div class="sr-dept-opt" onclick="srSelectDept(this,'SAFE','🛡️','Safety & Security')" style="padding:12px 10px;border:1.5px solid var(--gray-200);border-radius:10px;cursor:pointer;transition:all .15s;text-align:center;">
+              <div style="font-size:22px;margin-bottom:5px;">🛡️</div>
+              <div style="font-size:12px;font-weight:600;color:var(--gray-700);">Safety & Security</div>
+              <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Access · Fire · CCTV</div>
+            </div>
+            <div class="sr-dept-opt" onclick="srSelectDept(this,'IT','💻','IT Infrastructure')" style="padding:12px 10px;border:1.5px solid var(--gray-200);border-radius:10px;cursor:pointer;transition:all .15s;text-align:center;">
+              <div style="font-size:22px;margin-bottom:5px;">💻</div>
+              <div style="font-size:12px;font-weight:600;color:var(--gray-700);">IT Infrastructure</div>
+              <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Network · Servers · AV</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service Type (dynamic, shown after dept selected) -->
+        <div id="sr-type-section" style="display:none;margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:600;color:var(--gray-700);letter-spacing:.04em;margin-bottom:8px;">Service Type <span style="color:var(--accent-red)">*</span></div>
+          <div id="sr-type-chips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+        </div>
+
+        <!-- Priority -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:600;color:var(--gray-700);letter-spacing:.04em;margin-bottom:8px;">Priority <span style="color:var(--accent-red)">*</span></div>
+          <div style="display:flex;gap:8px;">
+            <div class="sr-priority-opt" onclick="srSelectPriority(this,'1','Critical')" style="flex:1;padding:9px 6px;border:1.5px solid var(--gray-200);border-radius:8px;cursor:pointer;text-align:center;transition:all .15s;">
+              <div style="font-size:14px;margin-bottom:3px;">🔴</div>
+              <div style="font-size:11px;font-weight:700;color:var(--accent-red);">P1</div>
+              <div style="font-size:9px;color:var(--gray-500);">Critical</div>
+            </div>
+            <div class="sr-priority-opt" onclick="srSelectPriority(this,'2','High')" style="flex:1;padding:9px 6px;border:1.5px solid var(--gray-200);border-radius:8px;cursor:pointer;text-align:center;transition:all .15s;">
+              <div style="font-size:14px;margin-bottom:3px;">🟠</div>
+              <div style="font-size:11px;font-weight:700;color:var(--accent-amber);">P2</div>
+              <div style="font-size:9px;color:var(--gray-500);">High</div>
+            </div>
+            <div class="sr-priority-opt" onclick="srSelectPriority(this,'3','Normal')" style="flex:1;padding:9px 6px;border:1.5px solid var(--gray-200);border-radius:8px;cursor:pointer;text-align:center;transition:all .15s;">
+              <div style="font-size:14px;margin-bottom:3px;">🟡</div>
+              <div style="font-size:11px;font-weight:700;color:var(--primary-dark);">P3</div>
+              <div style="font-size:9px;color:var(--gray-500);">Normal</div>
+            </div>
+            <div class="sr-priority-opt" onclick="srSelectPriority(this,'4','Low')" style="flex:1;padding:9px 6px;border:1.5px solid var(--gray-200);border-radius:8px;cursor:pointer;text-align:center;transition:all .15s;">
+              <div style="font-size:14px;margin-bottom:3px;">🟢</div>
+              <div style="font-size:11px;font-weight:700;color:var(--gray-500);">P4</div>
+              <div style="font-size:9px;color:var(--gray-500);">Low</div>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="srGoStep(2)" style="width:100%;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-input);font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;">Next: Description & Location →</button>
+      </div>
+
+      <!-- ── STEP 2: Description & Location ── -->
+      <div id="sr-step-2" style="display:none;padding:20px 20px 0;">
+        <div style="font-size:12px;font-weight:700;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;">Description & Location</div>
+
+        <!-- Summary card of step 1 -->
+        <div id="sr-step1-summary" style="background:var(--primary-light);border:1px solid var(--primary-mid);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
+          <div id="sr-sum-icon" style="font-size:22px;"></div>
+          <div>
+            <div id="sr-sum-dept" style="font-size:13px;font-weight:600;color:var(--primary-dark);"></div>
+            <div id="sr-sum-detail" style="font-size:11px;color:var(--primary-dark);opacity:.7;margin-top:1px;"></div>
+          </div>
+        </div>
+
+        <!-- Subject -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:600;color:var(--gray-700);letter-spacing:.04em;margin-bottom:6px;">SR Subject / Title <span style="color:var(--accent-red)">*</span></div>
+          <input id="sr-subject" class="form-input" placeholder="e.g. HVAC not cooling — Floor 3 East Wing" style="width:100%;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 14px;font-size:13px;color:var(--gray-900);outline:none;">
+        </div>
+
+        <!-- Description -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:600;color:var(--gray-700);letter-spacing:.04em;margin-bottom:6px;">Description <span style="color:var(--accent-red)">*</span></div>
+          <textarea id="sr-desc" placeholder="Describe the issue in detail — include any error codes, affected areas, or recent events..." style="width:100%;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 14px;font-size:13px;color:var(--gray-900);outline:none;resize:none;height:90px;font-family:'IBM Plex Sans',sans-serif;"></textarea>
+        </div>
+
+        <!-- Location -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:600;color:var(--gray-700);letter-spacing:.04em;margin-bottom:6px;">Location <span style="color:var(--accent-red)">*</span></div>
+          <div onclick="openSRLocationPicker()" style="background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gray-500)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span id="sr-loc-display" style="font-size:13px;color:var(--gray-500);">Tap to select location…</span>
+            </div>
+            <span style="font-size:12px;color:var(--primary-dark);font-weight:600;">Select →</span>
+          </div>
+        </div>
+
+        <!-- Attachment -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:600;color:var(--gray-700);letter-spacing:.04em;margin-bottom:6px;">Attach Photo / Document</div>
+          <div class="upload-zone" style="margin:0;">
+            <div class="upload-icon">📷</div>
+            <div class="upload-text">Tap to attach photos or files</div>
+            <div class="upload-sub">JPG, PNG, PDF — max 20MB</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button onclick="srGoStep(1)" style="flex:1;padding:13px;background:#fff;color:var(--gray-700);border:1.5px solid var(--gray-300);border-radius:var(--radius-input);font-size:14px;font-weight:600;cursor:pointer;">← Back</button>
+          <button onclick="srGoStep(3)" style="flex:2;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-input);font-size:14px;font-weight:600;cursor:pointer;">Next: Review & Submit →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3: Review & Submit ── -->
+      <div id="sr-step-3" style="display:none;padding:20px 20px 0;">
+        <div style="font-size:12px;font-weight:700;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;">Review & Submit</div>
+
+        <div id="sr-review-card" style="background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:12px;padding:16px;margin-bottom:16px;">
+          <!-- filled by JS -->
+        </div>
+
+        <div style="background:var(--primary-light);border-left:3px solid var(--primary);border-radius:0 8px 8px 0;padding:10px 14px;font-size:11px;color:var(--primary-dark);line-height:1.6;margin-bottom:16px;">
+          Submitting will create an SR record in <strong>IBM Maximo</strong> via <span style="font-family:'IBM Plex Mono',monospace;">POST /oslc/os/mxsr</span>. You will receive an SR number immediately.
+        </div>
+
+        <!-- Requested by -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:600;color:var(--gray-700);letter-spacing:.04em;margin-bottom:6px;">Requested By</div>
+          <input class="form-input" value="Mohamed Hassan" disabled style="width:100%;background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 14px;font-size:13px;color:var(--gray-500);">
+        </div>
+
+        <!-- Contact -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:600;color:var(--gray-700);letter-spacing:.04em;margin-bottom:6px;">Contact / Callback Number</div>
+          <input class="form-input" placeholder="+97312345678" style="width:100%;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 14px;font-size:13px;color:var(--gray-900);outline:none;">
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button onclick="srGoStep(2)" style="flex:1;padding:13px;background:#fff;color:var(--gray-700);border:1.5px solid var(--gray-300);border-radius:var(--radius-input);font-size:14px;font-weight:600;cursor:pointer;">← Back</button>
+          <button onclick="srSubmit()" style="flex:2;padding:13px;background:var(--primary-dark);color:#fff;border:none;border-radius:var(--radius-input);font-size:14px;font-weight:700;cursor:pointer;">✓ Submit SR</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 4: Success ── -->
+      <div id="sr-step-4" style="display:none;padding:40px 20px;text-align:center;">
+        <div style="font-size:52px;margin-bottom:16px;">✅</div>
+        <div style="font-size:18px;font-weight:700;color:var(--gray-900);margin-bottom:6px;">SR Submitted!</div>
+        <div id="sr-success-num" style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--primary-dark);background:var(--primary-light);border-radius:8px;padding:8px 16px;display:inline-block;margin-bottom:12px;"></div>
+        <div style="font-size:13px;color:var(--gray-500);line-height:1.6;margin-bottom:24px;">Your service request has been created in Maximo. The assigned department will be in touch shortly.</div>
+        <button onclick="closeSRModal()" style="width:100%;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-input);font-size:14px;font-weight:600;cursor:pointer;">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SR DETAIL MODAL ═══════════════════════════ -->
+  <div id="sr-detail-modal" onclick="if(event.target===this){this.style.display='none';}" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;display:none;align-items:flex-end;justify-content:center;">
+    <div onclick="event.stopPropagation()" style="background:#fff;border-radius:20px 20px 0 0;width:390px;max-height:88vh;overflow-y:auto;padding:0 0 24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px 0;">
+        <div style="width:40px;height:4px;background:var(--gray-200);border-radius:2px;margin:0 auto;flex:1;"></div>
+        <button onclick="document.getElementById('sr-detail-modal').style.display='none'" style="width:28px;height:28px;border-radius:50%;background:var(--gray-100);border:none;cursor:pointer;font-size:14px;color:var(--gray-700);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:12px;">✕</button>
+      </div>
+      <div id="sr-detail-content" style="padding:16px 20px 0;"></div>
+    </div>
+  </div>
+
+  <!-- ══ NEW PERMIT MODAL ═══════════════════════════ -->
+  <div id="new-permit-modal" onclick="if(event.target===this){this.style.display='none';}" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:flex-end;justify-content:center;">
+    <div onclick="event.stopPropagation()" id="permit-modal-sheet" style="background:#fff;border-radius:20px 20px 0 0;width:390px;max-height:85vh;overflow-y:auto;padding:20px 20px 32px;">
+      <div style="width:40px;height:4px;background:var(--gray-200);border-radius:2px;margin:0 auto 16px;"></div>
+      <div id="permit-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ══ NEW CLAIM MODAL ════════════════════════════ -->
+  <div id="new-claim-modal" onclick="if(event.target===this){this.style.display='none';}" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:flex-end;justify-content:center;">
+    <div onclick="event.stopPropagation()" style="background:#fff;border-radius:20px 20px 0 0;width:390px;max-height:85vh;overflow-y:auto;padding:20px 20px 32px;">
+      <div style="width:40px;height:4px;background:var(--gray-200);border-radius:2px;margin:0 auto 16px;"></div>
+      <div id="claim-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ══ PAY MODAL ══════════════════════════════════ -->
+  <div id="pay-modal" onclick="if(event.target===this){this.style.display='none';}" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:600;display:none;align-items:flex-end;justify-content:center;">
+    <div onclick="event.stopPropagation()" style="background:#fff;border-radius:20px 20px 0 0;width:390px;padding:20px 20px 32px;">
+      <div style="width:40px;height:4px;background:var(--gray-200);border-radius:2px;margin:0 auto 16px;"></div>
+      <div id="pay-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ══ TOAST NOTIFICATION ════════════════════════ -->
+  <div id="toast" style="position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gray-900);color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;font-weight:500;opacity:0;transition:all .3s;z-index:9999;white-space:nowrap;pointer-events:none;"></div>
+
+  <!-- ══ SR LOCATION PICKER MODAL ═══════════════════ -->
+  <div id="sr-loc-modal" onclick="if(event.target===this){this.style.display='none';document.getElementById('new-sr-modal').style.display='flex';}" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;display:none;align-items:flex-end;justify-content:center;">
+    <div onclick="event.stopPropagation()" style="background:#fff;border-radius:20px 20px 0 0;width:390px;max-height:78vh;overflow-y:auto;padding:20px;">
+      <div style="width:40px;height:4px;background:var(--gray-200);border-radius:2px;margin:0 auto 16px;"></div>
+      <div style="font-size:15px;font-weight:600;color:var(--gray-900);margin-bottom:4px;">Select SR Location</div>
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:16px;">Choose each segment to build the location code</div>
+
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">1. Project</div>
+        <div id="srloc-step-project" style="display:flex;flex-direction:column;gap:6px;">
+          <div class="srloc-opt-full" onclick="srlocSelectProject('WVR','Wesal Views Residence',this)" style="padding:10px 14px;border:1.5px solid var(--gray-200);background:#fff;border-radius:8px;font-size:13px;color:var(--gray-700);cursor:pointer;display:flex;align-items:center;justify-content:space-between;">
+            <div><div style="font-weight:500;">Wesal Views Residence</div><div style="font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--gray-500);">WVR</div></div>
+          </div>
+          <div class="srloc-opt-full" onclick="srlocSelectProject('WR','Wesal Residence',this)" style="padding:10px 14px;border:1.5px solid var(--gray-200);background:#fff;border-radius:8px;font-size:13px;color:var(--gray-700);cursor:pointer;display:flex;align-items:center;justify-content:space-between;">
+            <div><div style="font-weight:500;">Wesal Residence</div><div style="font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--gray-500);">WR</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">2. Zone</div>
+        <div id="srloc-step-zone" style="display:flex;flex-wrap:wrap;gap:8px;">
+          <div class="srloc-opt" onclick="srlocSelect('zone','Z1',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">Z1</div>
+          <div class="srloc-opt" onclick="srlocSelect('zone','Z2',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">Z2</div>
+          <div class="srloc-opt" onclick="srlocSelect('zone','Z3',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">Z3</div>
+          <div class="srloc-opt" onclick="srlocSelect('zone','Z4',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">Z4</div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">3. Building</div>
+        <div id="srloc-step-building" style="display:flex;flex-wrap:wrap;gap:8px;">
+          <div class="srloc-opt" onclick="srlocSelect('building','001',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">001</div>
+          <div class="srloc-opt" onclick="srlocSelect('building','002',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">002</div>
+          <div class="srloc-opt" onclick="srlocSelect('building','003',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">003</div>
+          <div class="srloc-opt" onclick="srlocSelect('building','004',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">004</div>
+          <div class="srloc-opt" onclick="srlocSelect('building','005',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">005</div>
+          <div class="srloc-opt" onclick="srlocSelect('building','006',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">006</div>
+          <div class="srloc-opt" onclick="srlocSelect('building','007',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">007</div>
+          <div class="srloc-opt" onclick="srlocSelect('building','008',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">008</div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">4. Floor</div>
+        <div id="srloc-step-floor" style="display:flex;flex-wrap:wrap;gap:8px;">
+          <div class="srloc-opt" onclick="srlocSelect('floor','G',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">G</div>
+          <div class="srloc-opt" onclick="srlocSelect('floor','1',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">1</div>
+          <div class="srloc-opt" onclick="srlocSelect('floor','2',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">2</div>
+          <div class="srloc-opt" onclick="srlocSelect('floor','3',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">3</div>
+          <div class="srloc-opt" onclick="srlocSelect('floor','4',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">4</div>
+          <div class="srloc-opt" onclick="srlocSelect('floor','5',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">5</div>
+          <div class="srloc-opt" onclick="srlocSelect('floor','6',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">6</div>
+          <div class="srloc-opt" onclick="srlocSelect('floor','R',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">R</div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">5. Unit</div>
+        <div id="srloc-step-unit" style="display:flex;flex-wrap:wrap;gap:8px;">
+          <div class="srloc-opt" onclick="srlocSelect('unit','01',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">01</div>
+          <div class="srloc-opt" onclick="srlocSelect('unit','02',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">02</div>
+          <div class="srloc-opt" onclick="srlocSelect('unit','03',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">03</div>
+          <div class="srloc-opt" onclick="srlocSelect('unit','04',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">04</div>
+          <div class="srloc-opt" onclick="srlocSelect('unit','05',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">05</div>
+          <div class="srloc-opt" onclick="srlocSelect('unit','06',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">06</div>
+          <div class="srloc-opt" onclick="srlocSelect('unit','07',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">07</div>
+          <div class="srloc-opt" onclick="srlocSelect('unit','08',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">08</div>
+          <div class="srloc-opt" onclick="srlocSelect('unit','09',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">09</div>
+          <div class="srloc-opt" onclick="srlocSelect('unit','10',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">10</div>
+          <div class="srloc-opt" onclick="srlocSelect('unit','11',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">11</div>
+          <div class="srloc-opt" onclick="srlocSelect('unit','12',this)" style="padding:9px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;">12</div>
+        </div>
+      </div>
+
+      <div style="background:var(--primary-light);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:10px;color:var(--primary-dark);font-weight:600;text-transform:uppercase;letter-spacing:.06em;opacity:.7;">Location Code</div>
+          <div id="srloc-preview" style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:var(--primary-dark);">—</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <button id="srloc-confirm-btn" onclick="srlocConfirm()" disabled style="width:100%;padding:13px;background:var(--gray-200);color:var(--gray-500);border:none;border-radius:var(--radius-input);font-size:14px;font-weight:600;cursor:not-allowed;">Confirm Location</button>
+    </div>
+  </div>
+
+  <!-- ══ LOCATION MODAL (Registration Screen) ══════════ -->
+  <div id="reg-modal-backdrop" onclick="handleRegBackdropClick(event)" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center;">
+    <div onclick="event.stopPropagation()" style="background:#fff;border-radius:20px 20px 0 0;width:390px;max-height:78vh;overflow-y:auto;padding:20px;animation:slideUpReg .25s ease;">
+      <div style="width:40px;height:4px;background:var(--gray-200);border-radius:2px;margin:0 auto 16px;"></div>
+      <div style="font-size:16px;font-weight:600;color:var(--gray-900);margin-bottom:4px;">Select Location</div>
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:16px;">Choose each segment to build the location code</div>
+
+      <!-- Step 1: Project -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">1. Project / Development</div>
+        <div id="reg-step-project" style="display:flex;flex-direction:column;gap:6px;">
+          <div class="reg-modal-opt-full selected" onclick="regSelectProject('WVR','Wesal Views Residence',this)" style="padding:10px 14px;border:1.5px solid var(--primary);background:var(--primary-light);border-radius:8px;font-size:13px;color:var(--primary-dark);cursor:pointer;display:flex;align-items:center;justify-content:space-between;">
+            <div><div style="font-weight:500;">Wesal Views Residence</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--primary-dark);opacity:.7;">WVR</div></div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary-dark)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="reg-modal-opt-full" onclick="regSelectProject('WR','Wesal Residence',this)" style="padding:10px 14px;border:1.5px solid var(--gray-200);background:#fff;border-radius:8px;font-size:13px;color:var(--gray-700);cursor:pointer;display:flex;align-items:center;justify-content:space-between;">
+            <div><div style="font-weight:500;">Wesal Residence</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gray-500);">WR</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Zone -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">2. Zone</div>
+        <div id="reg-step-zone" style="display:flex;flex-wrap:wrap;gap:8px;">
+          <div class="reg-modal-opt" onclick="regSelectZone('Z1',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">Z1 — Zone 1</div>
+          <div class="reg-modal-opt" onclick="regSelectZone('Z2',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">Z2 — Zone 2</div>
+          <div class="reg-modal-opt" onclick="regSelectZone('Z3',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">Z3 — Zone 3</div>
+          <div class="reg-modal-opt" onclick="regSelectZone('Z4',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">Z4 — Zone 4</div>
+        </div>
+      </div>
+
+      <!-- Step 3: Building -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">3. Building</div>
+        <div id="reg-step-building" style="display:flex;flex-wrap:wrap;gap:8px;">
+          <div class="reg-modal-opt" onclick="regSelectBuilding('001',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">001</div>
+          <div class="reg-modal-opt" onclick="regSelectBuilding('002',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">002</div>
+          <div class="reg-modal-opt" onclick="regSelectBuilding('003',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">003</div>
+          <div class="reg-modal-opt" onclick="regSelectBuilding('004',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">004</div>
+          <div class="reg-modal-opt" onclick="regSelectBuilding('005',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">005</div>
+          <div class="reg-modal-opt" onclick="regSelectBuilding('006',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">006</div>
+          <div class="reg-modal-opt" onclick="regSelectBuilding('007',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">007</div>
+          <div class="reg-modal-opt" onclick="regSelectBuilding('008',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">008</div>
+        </div>
+      </div>
+
+      <!-- Step 4: Floor -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">4. Floor</div>
+        <div id="reg-step-floor" style="display:flex;flex-wrap:wrap;gap:8px;">
+          <div class="reg-modal-opt" onclick="regSelectFloor('G',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">G — Ground</div>
+          <div class="reg-modal-opt" onclick="regSelectFloor('1',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">1</div>
+          <div class="reg-modal-opt" onclick="regSelectFloor('2',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">2</div>
+          <div class="reg-modal-opt" onclick="regSelectFloor('3',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">3</div>
+          <div class="reg-modal-opt" onclick="regSelectFloor('4',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">4</div>
+          <div class="reg-modal-opt" onclick="regSelectFloor('5',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">5</div>
+          <div class="reg-modal-opt" onclick="regSelectFloor('6',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">6</div>
+          <div class="reg-modal-opt" onclick="regSelectFloor('7',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">7</div>
+          <div class="reg-modal-opt" onclick="regSelectFloor('8',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">8</div>
+          <div class="reg-modal-opt" onclick="regSelectFloor('R',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">R — Roof</div>
+        </div>
+      </div>
+
+      <!-- Step 5: Unit -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">5. Unit / Apartment</div>
+        <div id="reg-step-unit" style="display:flex;flex-wrap:wrap;gap:8px;">
+          <div class="reg-modal-opt" onclick="regSelectUnit('01',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">01</div>
+          <div class="reg-modal-opt" onclick="regSelectUnit('02',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">02</div>
+          <div class="reg-modal-opt" onclick="regSelectUnit('03',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">03</div>
+          <div class="reg-modal-opt" onclick="regSelectUnit('04',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">04</div>
+          <div class="reg-modal-opt" onclick="regSelectUnit('05',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">05</div>
+          <div class="reg-modal-opt" onclick="regSelectUnit('06',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">06</div>
+          <div class="reg-modal-opt" onclick="regSelectUnit('07',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">07</div>
+          <div class="reg-modal-opt" onclick="regSelectUnit('08',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">08</div>
+          <div class="reg-modal-opt" onclick="regSelectUnit('09',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">09</div>
+          <div class="reg-modal-opt" onclick="regSelectUnit('10',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">10</div>
+          <div class="reg-modal-opt" onclick="regSelectUnit('11',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">11</div>
+          <div class="reg-modal-opt" onclick="regSelectUnit('12',this)" style="padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;">12</div>
+        </div>
+      </div>
+
+      <!-- Live preview -->
+      <div style="background:var(--primary-light);border-radius:8px;padding:12px 14px;margin-top:14px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:11px;color:var(--primary-dark);font-weight:500;text-transform:uppercase;letter-spacing:.06em;opacity:.7;">Generated Location Code</div>
+          <div id="reg-modal-loc-code" style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:var(--primary-dark);letter-spacing:.05em;">WVR-Z1-___-_-__</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+
+      <button id="reg-modal-confirm-btn" onclick="regConfirmLocation()" disabled style="margin-top:16px;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-input);font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%;transition:background .15s;">Confirm Location</button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: PERMITS ════════════════════════════ -->
+  <div id="screen-permits" style="display:none">
+    <div class="screen-label">Screen 5 / 8</div>
+    <div class="screen-title">Permits Management</div>
+    <div class="screen-subtitle">Work permits with approval workflow visualizer · Permit type chips</div>
+    <div class="phone-frame active">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" style="background:var(--gray-50)">
+        <div class="status-bar dark" style="background:var(--gray-50)">
+          <span>9:41</span>
+          <div class="status-right"><span>●●●●</span><span>🔋</span></div>
+        </div>
+        <div class="screen-header">
+          <div class="back-btn">←</div>
+          <div class="screen-header-title">Permits Management <span class="api-tag">/mxwopermit</span></div>
+          <div class="screen-header-action">⚙️</div>
+        </div>
+        <div class="chip-row" style="padding-top:10px">
+          <div class="chip active">All <span class="chip-count">7</span></div>
+          <div class="chip">Approved <span class="chip-count">5</span></div>
+          <div class="chip">Pending <span class="chip-count">1</span></div>
+          <div class="chip">Expired <span class="chip-count">1</span></div>
+        </div>
+        <div style="padding:0 16px 4px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-500);margin-bottom:6px">Permit Types</div>
+          <div class="permit-type-row" style="padding:0;margin:0">
+            <div class="ptype-chip HOTWORK selected">🔥 HOT WORK</div>
+            <div class="ptype-chip ACCESS selected" style="background:var(--accent-blue);border-color:var(--accent-blue);color:#fff">🚪 ACCESS</div>
+            <div class="ptype-chip">❄️ COLD WORK</div>
+            <div class="ptype-chip">🏗️ CONFINED</div>
+            <div class="ptype-chip ELECTRICAL selected">⚡ ELECTRICAL</div>
+            <div class="ptype-chip">📐 HEIGHT</div>
+          </div>
+        </div>
+        <div class="list-area" style="padding-top:10px">
+          <!-- PERMIT CARD 1 — Active Approval Workflow -->
+          <div class="list-card border-amber">
+            <div class="card-header">
+              <div>
+                <div class="card-id">WP-4421 <span class="api-tag">HOTWORK</span></div>
+                <div class="card-title">Hot Work Permit — Refinery Unit 3</div>
+              </div>
+              <span class="status-pill pill-PENDING">PENDING</span>
+            </div>
+            <div class="card-desc">Welding and cutting operations in the refinery processing unit. Safety officer pre-clearance required.</div>
+            <div class="workflow">
+              <div class="wf-step">
+                <div class="wf-circle done">1</div>
+                <div class="wf-body">
+                  <div class="wf-title">Request Submitted</div>
+                  <div class="wf-detail">Mar 13, 2024 — Auto-confirmed</div>
+                </div>
+                <div class="wf-state-icon">✅</div>
+              </div>
+              <div class="wf-step">
+                <div class="wf-circle done">2</div>
+                <div class="wf-body">
+                  <div class="wf-title">Safety Officer Review</div>
+                  <div class="wf-detail">Mar 14, 2024 — Sara Ali approved</div>
+                </div>
+                <div class="wf-state-icon">✅</div>
+              </div>
+              <div class="wf-step">
+                <div class="wf-circle active">3</div>
+                <div class="wf-body">
+                  <div class="wf-title">Supervisor Approval</div>
+                  <div class="wf-detail">Awaiting sign-off from J. Khalid</div>
+                </div>
+                <div class="wf-state-icon" style="color:var(--accent-blue)">▶</div>
+              </div>
+              <div class="wf-step">
+                <div class="wf-circle pending">4</div>
+                <div class="wf-body">
+                  <div class="wf-title">Permit Issued</div>
+                  <div class="wf-detail">Pending approval above</div>
+                </div>
+                <div class="wf-state-icon" style="color:var(--gray-300)">○</div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="card-footer-left">Valid: Mar 15–17, 2024</div>
+              <span class="status-pill pill-WAPPR">WAPPR</span>
+            </div>
+          </div>
+          <!-- PERMIT CARD 2 — Approved -->
+          <div class="list-card border-green">
+            <div class="card-header">
+              <div>
+                <div class="card-id">WP-4418 <span class="api-tag">ACCESS</span></div>
+                <div class="card-title">Controlled Area Access — Data Center</div>
+              </div>
+              <span class="status-pill pill-APPROVED">APPROVED</span>
+            </div>
+            <div class="card-desc">Authorized access to secure server room for network infrastructure upgrades.</div>
+            <div class="workflow">
+              <div class="wf-step">
+                <div class="wf-circle done">1</div>
+                <div class="wf-body"><div class="wf-title">Request Submitted</div><div class="wf-detail">Mar 10, 2024</div></div>
+                <div class="wf-state-icon">✅</div>
+              </div>
+              <div class="wf-step">
+                <div class="wf-circle done">2</div>
+                <div class="wf-body"><div class="wf-title">Security Clearance</div><div class="wf-detail">Mar 11, 2024 — Approved</div></div>
+                <div class="wf-state-icon">✅</div>
+              </div>
+              <div class="wf-step">
+                <div class="wf-circle done">3</div>
+                <div class="wf-body"><div class="wf-title">Permit Issued</div><div class="wf-detail">Mar 12, 2024 — Active</div></div>
+                <div class="wf-state-icon">✅</div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="card-footer-left">Valid: Mar 12–19, 2024</div>
+              <span class="status-pill pill-ACTIVE">ACTIVE</span>
+            </div>
+          </div>
+        </div>
+        <div class="fab-relative" onclick="openNewPermitModal()">+</div>
+        <div class="bottom-nav">
+          <div class="bn-item" onclick="navTo('dashboard','nav-dashboard')"><div class="bn-icon">🏠</div><div class="bn-label">Home</div></div>
+          <div class="bn-item active"><div class="bn-icon">📋</div><div class="bn-label">Requests</div></div>
+          <div class="bn-item" onclick="navTo('billing','nav-billing')"><div class="bn-icon">💰</div><div class="bn-label">Billing</div></div>
+          <div class="bn-item" onclick="navTo('profile','nav-profile')"><div class="bn-icon">👤</div><div class="bn-label">Profile</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: CLAIMS ═════════════════════════════ -->
+  <div id="screen-claims" style="display:none">
+    <div class="screen-label">Screen 6 / 8</div>
+    <div class="screen-title">Claims Management</div>
+    <div class="screen-subtitle">Claims list with approved amount banner · Document upload zone</div>
+    <div class="phone-frame active">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" style="background:var(--gray-50)">
+        <div class="status-bar dark" style="background:var(--gray-50)">
+          <span>9:41</span>
+          <div class="status-right"><span>●●●●</span><span>🔋</span></div>
+        </div>
+        <div class="screen-header">
+          <div class="back-btn">←</div>
+          <div class="screen-header-title">Claims Management <span class="api-tag">/mxclaim</span></div>
+          <div class="screen-header-action">⚙️</div>
+        </div>
+        <div class="chip-row" style="padding-top:10px">
+          <div class="chip active">All <span class="chip-count">6</span></div>
+          <div class="chip">Submitted <span class="chip-count">1</span></div>
+          <div class="chip">Under Review <span class="chip-count">2</span></div>
+          <div class="chip">Approved <span class="chip-count">3</span></div>
+        </div>
+        <div class="list-area">
+          <!-- CLAIM CARD 1 — Approved with amount banner -->
+          <div class="list-card border-green">
+            <div class="card-header">
+              <div>
+                <div class="card-id">CLM-042 <span class="api-tag">INSURANCE</span></div>
+                <div class="card-title">Equipment Damage — Storm Event Feb 2024</div>
+              </div>
+              <span class="status-pill pill-APPROVED">APPROVED</span>
+            </div>
+            <div class="card-desc">Claim for HVAC and server room equipment damaged during severe weather event.</div>
+            <div class="approved-banner">
+              <div>
+                <div class="banner-amount">$4,200.00</div>
+                <div class="banner-label">Approved Amount</div>
+              </div>
+              <div style="text-align:right">
+                <div class="banner-claimed">of $5,100.00</div>
+                <div class="banner-claimed-sub">claimed → Processed</div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="card-footer-left">Submitted: Feb 28, 2024</div>
+              <div class="card-footer-right">Processed: Mar 10</div>
+            </div>
+          </div>
+          <!-- CLAIM CARD 2 — Under Review -->
+          <div class="list-card border-blue">
+            <div class="card-header">
+              <div>
+                <div class="card-id">CLM-043 <span class="api-tag">WARRANTY</span></div>
+                <div class="card-title">UPS Battery Replacement — Server Room</div>
+              </div>
+              <span class="status-pill pill-REVIEW">UNDER REVIEW</span>
+            </div>
+            <div class="card-desc">UPS unit failed under warranty. Claiming replacement of 8 battery modules.</div>
+            <div style="margin:8px 0">
+              <div style="font-size:11px;color:var(--gray-500);margin-bottom:6px">Attached Documents</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <div style="background:var(--gray-100);border-radius:6px;padding:5px 10px;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--gray-700)">📄 warranty_cert.pdf</div>
+                <div style="background:var(--gray-100);border-radius:6px;padding:5px 10px;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--gray-700)">📷 damage_photos.zip</div>
+              </div>
+            </div>
+            <div class="upload-zone">
+              <div class="upload-icon">📎</div>
+              <div class="upload-text">Tap to attach supporting documents</div>
+              <div class="upload-sub">PDF, JPG, PNG up to 20MB</div>
+            </div>
+            <div class="card-footer">
+              <div class="card-footer-left">Submitted: Mar 5, 2024</div>
+              <div class="card-footer-right">$3,840.00 claimed</div>
+            </div>
+          </div>
+          <!-- CLAIM CARD 3 — Submitted -->
+          <div class="list-card border-amber">
+            <div class="card-header">
+              <div>
+                <div class="card-id">CLM-044 <span class="api-tag">DAMAGE</span></div>
+                <div class="card-title">Parking Structure — Vehicle Impact Damage</div>
+              </div>
+              <span class="status-pill pill-SUBMITTED">SUBMITTED</span>
+            </div>
+            <div class="card-desc">Structural damage to parking column B4 due to vehicle impact incident.</div>
+            <div class="upload-zone">
+              <div class="upload-icon">📎</div>
+              <div class="upload-text">Add police report or incident documentation</div>
+              <div class="upload-sub">Drag & drop or tap to browse</div>
+            </div>
+            <div class="card-footer">
+              <div class="card-footer-left">Submitted: Mar 18, 2024</div>
+              <div class="card-footer-right">$12,000.00 claimed</div>
+            </div>
+          </div>
+        </div>
+        <button class="primary-btn" style="position:sticky;bottom:68px;margin:0 16px;width:calc(100% - 32px)" onclick="openNewClaimModal()">+ Submit New Claim</button>
+        <div class="bottom-nav">
+          <div class="bn-item" onclick="navTo('dashboard','nav-dashboard')"><div class="bn-icon">🏠</div><div class="bn-label">Home</div></div>
+          <div class="bn-item active"><div class="bn-icon">📋</div><div class="bn-label">Requests</div></div>
+          <div class="bn-item" onclick="navTo('billing','nav-billing')"><div class="bn-icon">💰</div><div class="bn-label">Billing</div></div>
+          <div class="bn-item" onclick="navTo('profile','nav-profile')"><div class="bn-icon">👤</div><div class="bn-label">Profile</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: BILLING / INVOICES ═══════════════════ -->
+  <div id="screen-billing" style="display:none">
+    <div class="screen-label">Screen 7 / 8</div>
+    <div class="screen-title">Service Invoices</div>
+    <div class="screen-subtitle">Invoices generated from completed Service Requests · linked SR reference on each invoice</div>
+    <div class="phone-frame active">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" style="background:var(--gray-50)">
+        <div class="status-bar light" style="position:absolute;width:100%;top:0;z-index:20">
+          <span style="color:#fff">9:41</span>
+          <div class="status-right" style="color:#fff"><span>●●●●</span><span>🔋</span></div>
+        </div>
+
+        <!-- HEADER SUMMARY -->
+        <div class="billing-header" style="padding-top:52px">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.7)">Service Invoices <span class="api-tag" style="opacity:.6">/mxinvoice</span></div>
+          <div class="billing-balance">$18,420.00</div>
+          <div class="billing-sub-label">Total outstanding · 2 invoices pending · linked to your SRs</div>
+          <div class="billing-stats">
+            <div class="billing-stat">
+              <div class="billing-stat-val">9</div>
+              <div class="billing-stat-label">Total Invoices</div>
+            </div>
+            <div class="billing-stat">
+              <div class="billing-stat-val" style="color:#ff8a8a">2</div>
+              <div class="billing-stat-label">Pending</div>
+            </div>
+            <div class="billing-stat">
+              <div class="billing-stat-val">7</div>
+              <div class="billing-stat-label">Paid</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILTER CHIPS -->
+        <div class="chip-row" style="padding-top:12px">
+          <div class="chip active">All <span class="chip-count">9</span></div>
+          <div class="chip">Pending <span class="chip-count">2</span></div>
+          <div class="chip">Paid <span class="chip-count">7</span></div>
+        </div>
+
+        <!-- INVOICE LIST -->
+        <div class="list-area" style="padding-top:4px">
+
+          <!-- INVOICE 1 — Pending (linked to SR) -->
+          <div class="list-card border-amber" onclick="openInvoiceDetail('INV-2024-089')">
+            <div class="card-header">
+              <div>
+                <div class="card-id">INV-2024-089 <span class="api-tag">PENDING</span></div>
+                <div class="card-title">HVAC Maintenance — Floor 3</div>
+              </div>
+              <span class="status-pill pill-PENDING">PENDING</span>
+            </div>
+            <!-- Linked SR badge -->
+            <div style="display:inline-flex;align-items:center;gap:5px;background:var(--gray-100);border-radius:6px;padding:4px 9px;margin-bottom:8px;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--gray-500)" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+              <span style="font-size:10px;font-weight:600;color:var(--gray-600);font-family:'IBM Plex Mono',monospace;">SR-20240312</span>
+            </div>
+            <!-- Line items -->
+            <div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-700);margin-bottom:6px;"><span>HVAC Filter Replacement (×4)</span><span style="font-weight:600;">$480.00</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-700);margin-bottom:6px;"><span>Labour — 3 hrs @ $120/hr</span><span style="font-weight:600;">$360.00</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-700);margin-bottom:6px;"><span>Refrigerant Top-Up</span><span style="font-weight:600;">$210.00</span></div>
+              <div style="height:1px;background:var(--gray-200);margin:8px 0;"></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-500);margin-bottom:4px;"><span>VAT (15%)</span><span>$157.50</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--gray-900);"><span>Total</span><span style="color:var(--accent-amber);">$1,207.50</span></div>
+            </div>
+            <div class="card-footer">
+              <div class="card-footer-left">Issued: Mar 22, 2024</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="card-footer-right" style="color:var(--accent-amber);font-weight:600;">Due: Apr 5, 2024</div>
+                <button onclick="event.stopPropagation();openPayModal('INV-2024-089',1207.50)" style="background:var(--primary);color:#fff;border:none;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;">Pay Now</button>
+              </div>
+            </div>
+          </div> — Pending (linked to SR) -->
+          <div class="list-card border-red" onclick="openInvoiceDetail('INV-2024-083')">
+            <div class="card-header">
+              <div>
+                <div class="card-id">INV-2024-083 <span class="api-tag">PENDING</span></div>
+                <div class="card-title">Electrical Panel Inspection — B1</div>
+              </div>
+              <span class="status-pill pill-PENDING">PENDING</span>
+            </div>
+            <div style="display:inline-flex;align-items:center;gap:5px;background:var(--gray-100);border-radius:6px;padding:4px 9px;margin-bottom:8px;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--gray-500)" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+              <span style="font-size:10px;font-weight:600;color:var(--gray-600);font-family:'IBM Plex Mono',monospace;">SR-20240308</span>
+            </div>
+            <div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-700);margin-bottom:6px;"><span>Safety Inspection — Full Panel Audit</span><span style="font-weight:600;">$1,800.00</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-700);margin-bottom:6px;"><span>Replacement Breakers (×6)</span><span style="font-weight:600;">$540.00</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-700);margin-bottom:6px;"><span>Compliance Certificate</span><span style="font-weight:600;">$200.00</span></div>
+              <div style="height:1px;background:var(--gray-200);margin:8px 0;"></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-500);margin-bottom:4px;"><span>VAT (15%)</span><span>$381.00</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--gray-900);"><span>Total</span><span style="color:var(--accent-red);">$2,921.00</span></div>
+            </div>
+            <div class="card-footer">
+              <div class="card-footer-left">Issued: Mar 20, 2024</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="card-footer-right" style="color:var(--accent-red);font-weight:600;">Due: Apr 3, 2024</div>
+                <button onclick="event.stopPropagation();openPayModal('INV-2024-083',2921)" style="background:var(--accent-red);color:#fff;border:none;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;">Pay Now</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- INVOICE 3 — PAID -->
+          <div class="list-card border-green" onclick="openInvoiceDetail('INV-2024-077')">
+            <div class="card-header">
+              <div>
+                <div class="card-id">INV-2024-077 <span class="api-tag">PAID</span></div>
+                <div class="card-title">Water Leak Repair — Server Room</div>
+              </div>
+              <span class="status-pill pill-PAID">PAID</span>
+            </div>
+            <div style="display:inline-flex;align-items:center;gap:5px;background:var(--gray-100);border-radius:6px;padding:4px 9px;margin-bottom:8px;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--gray-500)" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+              <span style="font-size:10px;font-weight:600;color:var(--gray-600);font-family:'IBM Plex Mono',monospace;">SR-20240301</span>
+            </div>
+            <div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-700);margin-bottom:6px;"><span>Emergency Ceiling Repair</span><span style="font-weight:600;">$3,200.00</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-700);margin-bottom:6px;"><span>Waterproofing Treatment</span><span style="font-weight:600;">$850.00</span></div>
+              <div style="height:1px;background:var(--gray-200);margin:8px 0;"></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-500);margin-bottom:4px;"><span>VAT (15%)</span><span>$607.50</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--gray-900);"><span>Total</span><span style="color:var(--primary-dark);">$4,657.50</span></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+              <span style="font-size:16px">✅</span>
+              <span style="font-size:11px;color:var(--primary-dark);font-weight:600;">Paid on Mar 15, 2024</span>
+            </div>
+          </div>
+
+        </div><!-- end list-area -->
+
+        <div class="bottom-nav">
+          <div class="bn-item" onclick="navTo('dashboard','nav-dashboard')"><div class="bn-icon">🏠</div><div class="bn-label">Home</div></div>
+          <div class="bn-item" onclick="navTo('service-requests','nav-sr')"><div class="bn-icon">📋</div><div class="bn-label">Requests</div></div>
+          <div class="bn-item active" onclick="navTo('billing','nav-billing')"><div class="bn-icon">💰</div><div class="bn-label">Billing</div></div>
+          <div class="bn-item" onclick="navTo('profile','nav-profile')"><div class="bn-icon">👤</div><div class="bn-label">Profile</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ INVOICE DETAIL MODAL ═══════════════════════ -->
+  <div id="invoice-detail-modal" onclick="handleInvoiceBackdropClick(event)" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:none;align-items:flex-end;justify-content:center;">
+    <div id="invoice-detail-sheet" onclick="event.stopPropagation()" style="background:#fff;border-radius:20px 20px 0 0;width:390px;max-height:85vh;overflow-y:auto;padding:20px 20px 32px;">
+      <div style="width:40px;height:4px;background:var(--gray-200);border-radius:2px;margin:0 auto 16px;"></div>
+      <div id="invoice-detail-content"><!-- filled by JS --></div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: PROFILE ════════════════════════════ -->
+  <div id="screen-profile" style="display:none">
+    <div class="screen-label">Screen 8 / 8</div>
+    <div class="screen-title">Profile & Settings</div>
+    <div class="screen-subtitle">User identity, notification toggles, API key management, environment config</div>
+    <div class="phone-frame active">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" style="background:var(--gray-50)">
+        <div class="status-bar light" style="position:absolute;width:100%;top:0;z-index:20">
+          <span style="color:#fff">9:41</span>
+          <div class="status-right" style="color:#fff"><span>●●●●</span><span>🔋</span></div>
+        </div>
+        <div class="profile-header" style="padding-top:52px">
+          <div class="avatar-circle">MH</div>
+          <div class="profile-name">Mohamed Hassan</div>
+          <div class="profile-role">Senior IT Infrastructure Engineer</div>
+          <div class="profile-id">PERSONID: MHASSAN · ACC-20255839</div>
+        </div>
+        <!-- INFO CARD -->
+        <div class="info-card">
+          <div class="info-row">
+            <div class="info-icon">🏢</div>
+            <div style="flex:1"><div class="info-label">Company</div><div class="info-value" style="font-family:inherit;font-size:13px">Arab Banking Corporation</div></div>
+          </div>
+          <div class="info-row">
+            <div class="info-icon">✉️</div>
+            <div style="flex:1"><div class="info-label">Email</div><div class="info-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9cf1b2f4fdefeffdf2dcfdeefdfefefdf2f7f5f2fbb2fff3f1">[email&#160;protected]</a></div></div>
+          </div>
+          <div class="info-row">
+            <div class="info-icon">📱</div>
+            <div style="flex:1"><div class="info-label">Mobile</div><div class="info-value">+973 1234 5678</div></div>
+          </div>
+          <div class="info-row">
+            <div class="info-icon">🏷️</div>
+            <div style="flex:1"><div class="info-label">Account Number</div><div class="info-value">ACC-20255839</div></div>
+          </div>
+          <div class="info-row">
+            <div class="info-icon">🔐</div>
+            <div style="flex:1"><div class="info-label">Security Group</div><div class="info-value">CUSTOMERGRP · SERVICEPRV</div></div>
+          </div>
+        </div>
+        <!-- NOTIFICATIONS SETTINGS -->
+        <div class="settings-section" style="margin-top:16px">
+          <div class="settings-label">Notifications</div>
+          <div class="settings-card">
+            <div class="settings-row">
+              <div class="settings-row-icon">📋</div>
+              <div class="settings-row-text">
+                <div class="settings-row-title">SR Status Alerts</div>
+                <div class="settings-row-sub">Notify when SR status changes</div>
+              </div>
+              <div class="toggle on"></div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-icon">💳</div>
+              <div class="settings-row-text">
+                <div class="settings-row-title">Payment Reminders</div>
+                <div class="settings-row-sub">7 days before invoice due</div>
+              </div>
+              <div class="toggle on"></div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-icon">📄</div>
+              <div class="settings-row-text">
+                <div class="settings-row-title">Permit Expiry Alerts</div>
+                <div class="settings-row-sub">48 hours before expiry</div>
+              </div>
+              <div class="toggle"></div>
+            </div>
+          </div>
+        </div>
+        <!-- PREFERENCES SETTINGS -->
+        <div class="settings-section" style="margin-top:12px">
+          <div class="settings-label">Preferences</div>
+          <div class="settings-card">
+            <div class="settings-row">
+              <div class="settings-row-icon">🌐</div>
+              <div class="settings-row-text">
+                <div class="settings-row-title">Language</div>
+                <div class="settings-row-sub">English</div>
+              </div>
+              <div class="settings-arrow">›</div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-icon">🔑</div>
+              <div class="settings-row-text">
+                <div class="settings-row-title">API Key Management</div>
+                <div class="settings-row-sub">Rotate or update your Maximo API key</div>
+              </div>
+              <div class="settings-arrow">›</div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-icon">🖥️</div>
+              <div class="settings-row-text">
+                <div class="settings-row-title">Maximo Environment</div>
+                <div class="settings-row-sub" style="font-family:'IBM Plex Mono',monospace;font-size:10px">arabbanking.local · Production</div>
+              </div>
+              <div class="settings-arrow">›</div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-section" style="margin-top:12px">
+          <div class="settings-card">
+            <div class="signout-row">Sign Out</div>
+          </div>
+        </div>
+        <div class="profile-footer">
+          MaximoCRM v2.4.1 · IBM Maximo 7.6.1<br>
+          MIF OSLC REST API · arabbanking.local<br>
+          Session expires: 30 min idle · TLS 1.3
+        </div>
+        <div style="height:16px"></div>
+        <div class="bottom-nav">
+          <div class="bn-item" onclick="navTo('dashboard','nav-dashboard')"><div class="bn-icon">🏠</div><div class="bn-label">Home</div></div>
+          <div class="bn-item" onclick="navTo('service-requests','nav-sr')"><div class="bn-icon">📋</div><div class="bn-label">Requests</div></div>
+          <div class="bn-item" onclick="navTo('billing','nav-billing')"><div class="bn-icon">💰</div><div class="bn-label">Billing</div></div>
+          <div class="bn-item active" onclick="navTo('profile','nav-profile')"><div class="bn-icon">👤</div><div class="bn-label">Profile</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end proto-content -->
+</div><!-- end proto-shell -->
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/* ══════════════════════════════════════════
+   NEW SERVICE REQUEST MODAL
+══════════════════════════════════════════ */
+var srData = { dept:'', deptName:'', deptIcon:'', serviceType:'', priority:'', priorityLabel:'', subject:'', desc:'', location:'' };
+
+var srServiceTypes = {
+  MECH:  ['HVAC / Air Conditioning','Plumbing & Drainage','Lifts & Escalators','Fire Suppression','Generator / MEP'],
+  ELEC:  ['Electrical Panels','Lighting Fault','UPS / Backup Power','Socket / Wiring','Fire Alarm'],
+  CIVIL: ['Structural Repair','Waterproofing','Flooring / Tiling','Painting & Finishing','Roofing'],
+  SOFT:  ['Cleaning / Housekeeping','Pest Control','Landscaping','Waste Management','Façade Cleaning'],
+  SAFE:  ['Access Control','CCTV / Surveillance','Fire Safety Inspection','Security Incident','Gate / Barrier'],
+  IT:    ['Network / Wi-Fi Issue','Server Room','AV / Conferencing','CCTV / IT Security','Data Cabling']
+};
+
+function openNewSRModal() {
+  srData = { dept:'', deptName:'', deptIcon:'', serviceType:'', priority:'', priorityLabel:'', subject:'', desc:'', location:'' };
+  document.querySelectorAll('.sr-dept-opt').forEach(el => { el.style.background='#fff'; el.style.borderColor='var(--gray-200)'; });
+  document.querySelectorAll('.sr-priority-opt').forEach(el => { el.style.background='#fff'; el.style.borderColor='var(--gray-200)'; });
+  document.getElementById('sr-type-section').style.display = 'none';
+  document.getElementById('new-sr-modal').style.display = 'flex';
+  srGoStep(1);
+}
+
+function closeSRModal() {
+  document.getElementById('new-sr-modal').style.display = 'none';
+}
+
+function handleSRBackdropClick(e) {
+  if (e.target === document.getElementById('new-sr-modal')) closeSRModal();
+}
+
+function srGoStep(n) {
+  [1,2,3,4].forEach(i => {
+    var el = document.getElementById('sr-step-' + i);
+    if (el) el.style.display = (i === n) ? 'block' : 'none';
+  });
+  var indicator = document.getElementById('sr-step-indicator');
+  if (n <= 3) indicator.textContent = 'Step ' + n + ' / 3';
+  else indicator.textContent = 'Complete';
+  ['sr-prog-1','sr-prog-2','sr-prog-3'].forEach((id, idx) => {
+    document.getElementById(id).style.background = (idx < n) ? 'var(--primary)' : 'var(--gray-200)';
+  });
+  if (n === 3) srBuildReview();
+  document.getElementById('new-sr-sheet').scrollTop = 0;
+}
+
+function srSelectDept(el, code, icon, name) {
+  srData.dept = code; srData.deptName = name; srData.deptIcon = icon; srData.serviceType = '';
+  document.querySelectorAll('.sr-dept-opt').forEach(d => { d.style.background='#fff'; d.style.borderColor='var(--gray-200)'; d.querySelector('div:last-child').style.color='var(--gray-700)'; });
+  el.style.background = 'var(--primary-light)'; el.style.borderColor = 'var(--primary)'; el.querySelector('div:last-child').style.color = 'var(--primary-dark)';
+  // populate service types
+  var chips = document.getElementById('sr-type-chips');
+  chips.innerHTML = '';
+  srServiceTypes[code].forEach(type => {
+    var chip = document.createElement('div');
+    chip.textContent = type;
+    chip.style.cssText = 'padding:7px 12px;border:1.5px solid var(--gray-200);border-radius:20px;font-size:12px;font-weight:500;color:var(--gray-700);cursor:pointer;background:#fff;transition:all .12s;';
+    chip.onclick = function() {
+      chips.querySelectorAll('div').forEach(c => { c.style.background='#fff'; c.style.borderColor='var(--gray-200)'; c.style.color='var(--gray-700)'; });
+      this.style.background = 'var(--primary)'; this.style.borderColor = 'var(--primary)'; this.style.color = '#fff';
+      srData.serviceType = type;
+    };
+    chips.appendChild(chip);
+  });
+  document.getElementById('sr-type-section').style.display = 'block';
+}
+
+function srSelectPriority(el, code, label) {
+  srData.priority = code; srData.priorityLabel = label;
+  document.querySelectorAll('.sr-priority-opt').forEach(d => { d.style.background='#fff'; d.style.borderColor='var(--gray-200)'; });
+  el.style.background = 'var(--primary-light)'; el.style.borderColor = 'var(--primary)';
+}
+
+function srBuildReview() {
+  var loc = srData.location || '— not selected —';
+  var subj = document.getElementById('sr-subject').value || '— not entered —';
+  var desc = document.getElementById('sr-desc').value || '— not entered —';
+  document.getElementById('sr-review-card').innerHTML =
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--gray-200);">' +
+      '<div style="font-size:28px;">' + srData.deptIcon + '</div>' +
+      '<div><div style="font-size:14px;font-weight:700;color:var(--gray-900);">' + srData.deptName + '</div>' +
+      '<div style="font-size:11px;color:var(--gray-500);margin-top:2px;">' + (srData.serviceType || 'No type selected') + '</div></div>' +
+    '</div>' +
+    srReviewRow('Priority', 'P' + srData.priority + ' — ' + srData.priorityLabel) +
+    srReviewRow('Subject', subj) +
+    srReviewRow('Description', desc) +
+    srReviewRow('Location', '<span style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;">' + loc + '</span>');
+}
+
+function srReviewRow(label, val) {
+  return '<div style="margin-bottom:10px;"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:3px;">' + label + '</div>' +
+    '<div style="font-size:12px;color:var(--gray-900);line-height:1.5;">' + val + '</div></div>';
+}
+
+function srSubmit() {
+  var num = 'SR-' + (20240300 + Math.floor(Math.random()*99));
+  document.getElementById('sr-success-num').textContent = num + ' · ' + srData.deptName;
+  srGoStep(4);
+}
+
+/* SR location picker */
+var srlocSel = { project:'', projectName:'', zone:'', building:'', floor:'', unit:'' };
+
+function openSRLocationPicker() {
+  srlocSel = { project:'', projectName:'', zone:'', building:'', floor:'', unit:'' };
+  document.getElementById('srloc-preview').textContent = '—';
+  document.getElementById('srloc-confirm-btn').disabled = true;
+  document.getElementById('srloc-confirm-btn').style.background = 'var(--gray-200)';
+  document.getElementById('srloc-confirm-btn').style.color = 'var(--gray-500)';
+  document.getElementById('srloc-confirm-btn').style.cursor = 'not-allowed';
+  document.querySelectorAll('#sr-loc-modal .srloc-opt, #sr-loc-modal .srloc-opt-full').forEach(el => {
+    el.style.background = '#fff'; el.style.borderColor = 'var(--gray-200)'; el.style.color = 'var(--gray-700)';
+  });
+  document.getElementById('new-sr-modal').style.display = 'none';
+  document.getElementById('sr-loc-modal').style.display = 'flex';
+}
+
+function srlocSelectProject(code, name, el) {
+  srlocSel.project = code; srlocSel.projectName = name;
+  document.querySelectorAll('#srloc-step-project .srloc-opt-full').forEach(o => { o.style.background='#fff'; o.style.borderColor='var(--gray-200)'; });
+  el.style.background = 'var(--primary-light)'; el.style.borderColor = 'var(--primary)';
+  srlocUpdatePreview();
+}
+
+function srlocSelect(field, val, el) {
+  srlocSel[field] = val;
+  document.querySelectorAll('#srloc-step-' + field + ' .srloc-opt').forEach(o => { o.style.background='#fff'; o.style.borderColor='var(--gray-200)'; o.style.color='var(--gray-700)'; });
+  el.style.background = 'var(--primary)'; el.style.borderColor = 'var(--primary)'; el.style.color = '#fff';
+  srlocUpdatePreview();
+}
+
+function srlocUpdatePreview() {
+  var code = (srlocSel.project||'?') + '-' + (srlocSel.zone||'?') + '-' + (srlocSel.building||'?') + '-' + (srlocSel.floor||'?') + '-' + (srlocSel.unit||'?');
+  document.getElementById('srloc-preview').textContent = code;
+  var complete = srlocSel.project && srlocSel.zone && srlocSel.building && srlocSel.floor && srlocSel.unit;
+  var btn = document.getElementById('srloc-confirm-btn');
+  btn.disabled = !complete;
+  btn.style.background = complete ? 'var(--primary)' : 'var(--gray-200)';
+  btn.style.color = complete ? '#fff' : 'var(--gray-500)';
+  btn.style.cursor = complete ? 'pointer' : 'not-allowed';
+}
+
+function srlocConfirm() {
+  var code = srlocSel.project + '-' + srlocSel.zone + '-' + srlocSel.building + '-' + srlocSel.floor + '-' + srlocSel.unit;
+  srData.location = code;
+  document.getElementById('sr-loc-display').textContent = code;
+  document.getElementById('sr-loc-display').style.color = 'var(--primary-dark)';
+  document.getElementById('sr-loc-display').style.fontFamily = "'IBM Plex Mono', monospace";
+  document.getElementById('sr-loc-display').style.fontWeight = '600';
+  document.getElementById('sr-loc-modal').style.display = 'none';
+  document.getElementById('new-sr-modal').style.display = 'flex';
+}
+
+/* ══════════════════════════════════════════
+   INVOICE DETAIL MODAL
+══════════════════════════════════════════ */
+var invoiceData = {
+  'INV-2024-089': {
+    title: 'HVAC Maintenance — Floor 3', sr: 'SR-20240312', status: 'PENDING', statusColor: 'var(--accent-amber)',
+    issued: 'Mar 22, 2024', due: 'Apr 5, 2024',
+    lines: [['HVAC Filter Replacement (×4)', 480], ['Labour — 3 hrs @ $120/hr', 360], ['Refrigerant Top-Up', 210]],
+    vat: 0.15, dept: 'Mechanical', location: 'WVR-Z1-003-3-07'
+  },
+  'INV-2024-083': {
+    title: 'Electrical Panel Inspection — B1', sr: 'SR-20240308', status: 'PENDING', statusColor: 'var(--accent-red)',
+    issued: 'Mar 20, 2024', due: 'Apr 3, 2024',
+    lines: [['Safety Inspection — Full Panel Audit', 1800], ['Replacement Breakers (×6)', 540], ['Compliance Certificate', 200]],
+    vat: 0.15, dept: 'Electrical', location: 'WVR-Z2-001-B1-02'
+  },
+  'INV-2024-077': {
+    title: 'Water Leak Repair — Server Room', sr: 'SR-20240301', status: 'PAID', statusColor: 'var(--primary-dark)',
+    issued: 'Mar 15, 2024', due: 'Mar 30, 2024', paidDate: 'Mar 15, 2024',
+    lines: [['Emergency Ceiling Repair', 3200], ['Waterproofing Treatment', 850]],
+    vat: 0.15, dept: 'Civil', location: 'WVR-Z1-002-2-05'
+  }
+};
+
+function openInvoiceDetail(id) {
+  var inv = invoiceData[id];
+  if (!inv) return;
+  var subtotal = inv.lines.reduce(function(s, l) { return s + l[1]; }, 0);
+  var vat = subtotal * inv.vat;
+  var total = subtotal + vat;
+  var linesHtml = inv.lines.map(function(l) {
+    return '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-700);padding:6px 0;border-bottom:1px solid var(--gray-100);">' +
+      '<span>' + l[0] + '</span><span style="font-weight:600;">$' + l[1].toFixed(2) + '</span></div>';
+  }).join('');
+
+  document.getElementById('invoice-detail-content').innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">' +
+      '<div>' +
+        '<div style="font-size:11px;font-family:\'IBM Plex Mono\',monospace;color:var(--gray-500);margin-bottom:4px;">' + id + '</div>' +
+        '<div style="font-size:16px;font-weight:700;color:var(--gray-900);">' + inv.title + '</div>' +
+      '</div>' +
+      '<span style="background:' + (inv.status==='PAID'?'var(--primary-light)':'#fff8e6') + ';color:' + inv.statusColor + ';border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;">' + inv.status + '</span>' +
+    '</div>' +
+    '<div style="display:inline-flex;align-items:center;gap:5px;background:var(--gray-100);border-radius:6px;padding:5px 10px;margin-bottom:16px;">' +
+      '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--gray-500)" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>' +
+      '<span style="font-size:11px;font-weight:600;color:var(--gray-700);font-family:\'IBM Plex Mono\',monospace;">Linked SR: ' + inv.sr + '</span>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">' +
+      '<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;"><div style="font-size:10px;color:var(--gray-500);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Department</div><div style="font-size:12px;font-weight:600;color:var(--gray-900);margin-top:3px;">' + inv.dept + '</div></div>' +
+      '<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;"><div style="font-size:10px;color:var(--gray-500);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Location</div><div style="font-size:11px;font-weight:600;color:var(--gray-900);margin-top:3px;font-family:\'IBM Plex Mono\',monospace;">' + inv.location + '</div></div>' +
+      '<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;"><div style="font-size:10px;color:var(--gray-500);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Issued</div><div style="font-size:12px;font-weight:600;color:var(--gray-900);margin-top:3px;">' + inv.issued + '</div></div>' +
+      '<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;"><div style="font-size:10px;color:var(--gray-500);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">' + (inv.paidDate ? 'Paid On' : 'Due Date') + '</div><div style="font-size:12px;font-weight:600;color:' + (inv.paidDate?'var(--primary-dark)':inv.statusColor) + ';margin-top:3px;">' + (inv.paidDate || inv.due) + '</div></div>' +
+    '</div>' +
+    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-700);margin-bottom:8px;">Line Items</div>' +
+    '<div style="background:var(--gray-50);border-radius:10px;padding:12px;margin-bottom:14px;">' +
+      linesHtml +
+      '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-500);padding:8px 0 4px;"><span>Subtotal</span><span>$' + subtotal.toFixed(2) + '</span></div>' +
+      '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-500);padding-bottom:8px;border-bottom:1.5px solid var(--gray-200);"><span>VAT (15%)</span><span>$' + vat.toFixed(2) + '</span></div>' +
+      '<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:var(--gray-900);padding-top:8px;"><span>Total</span><span style="color:' + inv.statusColor + ';">$' + total.toFixed(2) + '</span></div>' +
+    '</div>' +
+    (inv.status !== 'PAID' ?
+      '<button onclick="showToast(\'📥 Invoice PDF downloaded\')" style="width:100%;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-input);font-size:14px;font-weight:700;cursor:pointer;">Download Invoice PDF</button><button onclick="var id=\'' + "' + id + '" + '\';document.getElementById(\'invoice-detail-modal\').style.display=\'none\';openPayModal(id,1050)" style="width:100%;margin-top:8px;padding:13px;background:var(--primary-dark);color:#fff;border:none;border-radius:var(--radius-input);font-size:14px;font-weight:700;cursor:pointer;">💳 Pay Now</button>' :
+      '<div style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--primary-light);border-radius:10px;padding:12px;"><span style="font-size:18px;">✅</span><span style="font-size:13px;font-weight:600;color:var(--primary-dark);">Paid on ' + inv.paidDate + '</span></div>'
+    );
+
+  document.getElementById('invoice-detail-modal').style.display = 'flex';
+}
+
+function handleInvoiceBackdropClick(e) {
+  if (e.target === document.getElementById('invoice-detail-modal')) {
+    document.getElementById('invoice-detail-modal').style.display = 'none';
+  }
+}
+
+/* ── Location Modal – Registration Screen ── */
+var regSel = { project: 'WVR', projectName: 'Wesal Views Residence', zone: '', building: '', floor: '', unit: '' };
+
+function openRegLocationModal() {
+  document.getElementById('reg-modal-backdrop').style.display = 'flex';
+  regUpdateModalPreview();
+}
+
+function handleRegBackdropClick(e) {
+  if (e.target === document.getElementById('reg-modal-backdrop')) {
+    document.getElementById('reg-modal-backdrop').style.display = 'none';
+  }
+}
+
+function regSelectProject(code, name, el) {
+  regSel.project = code; regSel.projectName = name;
+  document.querySelectorAll('#reg-step-project .reg-modal-opt-full').forEach(function(opt) {
+    opt.style.background = '#fff';
+    opt.style.borderColor = 'var(--gray-200)';
+    opt.style.color = 'var(--gray-700)';
+    var chk = opt.querySelector('svg'); if (chk) chk.remove();
+  });
+  el.style.background = 'var(--primary-light)';
+  el.style.borderColor = 'var(--primary)';
+  el.style.color = 'var(--primary-dark)';
+  var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('width','14'); svg.setAttribute('height','14');
+  svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('fill','none');
+  svg.setAttribute('stroke','var(--primary-dark)'); svg.setAttribute('stroke-width','2.5');
+  svg.innerHTML = '<polyline points="20 6 9 17 4 12"/>';
+  el.appendChild(svg);
+  regUpdateModalPreview();
+}
+
+function regSelectZone(z, el) {
+  regSel.zone = z;
+  document.querySelectorAll('#reg-step-zone .reg-modal-opt').forEach(function(opt){ opt.style.background='#fff'; opt.style.borderColor='var(--gray-200)'; opt.style.color='var(--gray-700)'; });
+  el.style.background = 'var(--primary)'; el.style.borderColor = 'var(--primary)'; el.style.color = '#fff';
+  regUpdateModalPreview();
+}
+
+function regSelectBuilding(b, el) {
+  regSel.building = b;
+  document.querySelectorAll('#reg-step-building .reg-modal-opt').forEach(function(opt){ opt.style.background='#fff'; opt.style.borderColor='var(--gray-200)'; opt.style.color='var(--gray-700)'; });
+  el.style.background = 'var(--primary)'; el.style.borderColor = 'var(--primary)'; el.style.color = '#fff';
+  regUpdateModalPreview();
+}
+
+function regSelectFloor(f, el) {
+  regSel.floor = f;
+  document.querySelectorAll('#reg-step-floor .reg-modal-opt').forEach(function(opt){ opt.style.background='#fff'; opt.style.borderColor='var(--gray-200)'; opt.style.color='var(--gray-700)'; });
+  el.style.background = 'var(--primary)'; el.style.borderColor = 'var(--primary)'; el.style.color = '#fff';
+  regUpdateModalPreview();
+}
+
+function regSelectUnit(u, el) {
+  regSel.unit = u;
+  document.querySelectorAll('#reg-step-unit .reg-modal-opt').forEach(function(opt){ opt.style.background='#fff'; opt.style.borderColor='var(--gray-200)'; opt.style.color='var(--gray-700)'; });
+  el.style.background = 'var(--primary)'; el.style.borderColor = 'var(--primary)'; el.style.color = '#fff';
+  regUpdateModalPreview();
+}
+
+function regUpdateModalPreview() {
+  var b = regSel.building || '___';
+  var f = regSel.floor    || '_';
+  var u = regSel.unit     || '__';
+  var code = regSel.project + '-' + (regSel.zone || 'Z?') + '-' + b + '-' + f + '-' + u;
+  document.getElementById('reg-modal-loc-code').textContent = code;
+  var complete = regSel.project && regSel.zone && regSel.building && regSel.floor && regSel.unit;
+  document.getElementById('reg-modal-confirm-btn').disabled = !complete;
+  document.getElementById('reg-modal-confirm-btn').style.background = complete ? 'var(--primary)' : 'var(--gray-200)';
+  document.getElementById('reg-modal-confirm-btn').style.color = complete ? '#fff' : 'var(--gray-500)';
+}
+
+function regConfirmLocation() {
+  var code = regSel.project + '-' + regSel.zone + '-' + regSel.building + '-' + regSel.floor + '-' + regSel.unit;
+  var green = 'var(--primary-dark)';
+
+  // Code display parts
+  ['reg-loc-part-project','reg-loc-part-zone','reg-loc-part-bldg','reg-loc-part-floor','reg-loc-part-apt',
+   'reg-loc-dash1','reg-loc-dash2','reg-loc-dash3','reg-loc-dash4'].forEach(function(id){
+    document.getElementById(id).style.color = green;
+  });
+  document.getElementById('reg-loc-part-project').textContent = regSel.project;
+  document.getElementById('reg-loc-part-zone').textContent    = regSel.zone;
+  document.getElementById('reg-loc-part-bldg').textContent    = regSel.building;
+  document.getElementById('reg-loc-part-floor').textContent   = regSel.floor;
+  document.getElementById('reg-loc-part-apt').textContent     = regSel.unit;
+
+  // Segment chips
+  var segs = [
+    ['reg-disp-project', regSel.project],
+    ['reg-disp-zone',    regSel.zone],
+    ['reg-disp-bldg',    regSel.building],
+    ['reg-disp-floor',   regSel.floor],
+    ['reg-disp-unit',    regSel.unit]
+  ];
+  segs.forEach(function(s){
+    var el = document.getElementById(s[0]);
+    el.textContent = s[1];
+    el.style.color = green;
+    el.style.borderColor = 'var(--primary-mid)';
+    el.style.background = 'var(--primary-light)';
+  });
+
+  // Name banner
+  var banner = document.getElementById('reg-loc-name-banner');
+  banner.style.display = 'flex';
+  document.getElementById('reg-loc-name-text').textContent = regSel.projectName;
+  document.getElementById('reg-loc-name-sub').textContent =
+    regSel.zone.replace('Z','Zone ') + ' · Building ' + regSel.building + ' · Floor ' + regSel.floor + ' · Unit ' + regSel.unit;
+
+  // Site field
+  document.getElementById('reg-site-field').value = regSel.project + '-SITE';
+
+  document.getElementById('reg-modal-backdrop').style.display = 'none';
+}
+
+/* Add slideUpReg keyframe dynamically */
+(function(){
+  var style = document.createElement('style');
+  style.textContent = '@keyframes slideUpReg{from{transform:translateY(100%)}to{transform:translateY(0)}}';
+  document.head.appendChild(style);
+})();
+
+function showScreen(id, navEl) {
+  // hide all screens
+  document.querySelectorAll('[id^="screen-"]').forEach(s => {
+    s.style.display = 'none';
+    const frame = s.querySelector('.phone-frame');
+    if (frame) frame.classList.remove('active');
+  });
+  // show target screen
+  const target = document.getElementById('screen-' + id);
+  if (!target) return;
+  target.style.display = 'block';
+  const frame = target.querySelector('.phone-frame');
+  if (frame) {
+    frame.classList.add('active');
+    frame.querySelectorAll('.list-card,.metric-card,.notif-item').forEach(el => {
+      el.style.animation = 'none';
+      el.offsetHeight;
+      el.style.animation = '';
+    });
+  }
+  // update sidebar active state
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (navEl) navEl.classList.add('active');
+  // scroll phone to top
+  const screen = target.querySelector('.phone-screen');
+  if (screen) screen.scrollTop = 0;
+}
+
+/* ══════════════════════════════════════════
+   GLOBAL NAVIGATION
+══════════════════════════════════════════ */
+var screenMap = {
+  'dashboard':       { screenId: 'screen-dashboard',       navId: 'nav-dashboard' },
+  'service-requests':{ screenId: 'screen-service-requests',navId: 'nav-sr' },
+  'permits':         { screenId: 'screen-permits',          navId: 'nav-permits' },
+  'claims':          { screenId: 'screen-claims',           navId: 'nav-claims' },
+  'billing':         { screenId: 'screen-billing',          navId: 'nav-billing' },
+  'registration':    { screenId: 'screen-registration',     navId: 'nav-reg' },
+  'profile':         { screenId: 'screen-profile',          navId: 'nav-profile' },
+  'login':           { screenId: 'screen-login',            navId: null }
+};
+
+function navTo(key, sidebarNavId) {
+  var map = screenMap[key];
+  if (!map) return;
+  // hide all
+  document.querySelectorAll('[id^="screen-"]').forEach(function(s) { s.style.display = 'none'; });
+  // show target
+  var target = document.getElementById(map.screenId);
+  if (target) target.style.display = 'block';
+  // sidebar nav
+  document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+  var navEl = sidebarNavId ? document.getElementById(sidebarNavId) : null;
+  if (!navEl && map.navId) navEl = document.getElementById(map.navId);
+  if (navEl) navEl.classList.add('active');
+  // scroll to top
+  var ps = target ? target.querySelector('.phone-screen') : null;
+  if (ps) ps.scrollTop = 0;
+}
+
+// Override showScreen to use navTo
+function showScreen(id, navEl) {
+  navTo(id);
+  if (navEl) {
+    document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+    navEl.classList.add('active');
+  }
+}
+
+/* ── Login → Dashboard ── */
+document.addEventListener('DOMContentLoaded', function() {
+  // Wire login button
+  var loginBtn = document.querySelector('.login-btn');
+  if (loginBtn) loginBtn.addEventListener('click', function() {
+    navTo('dashboard','nav-dashboard');
+  });
+  // Wire all back buttons
+  document.querySelectorAll('.back-btn').forEach(function(btn) {
+    btn.style.cursor = 'pointer';
+    btn.addEventListener('click', function() { navTo('dashboard','nav-dashboard'); });
+  });
+  // Wire toggles
+  document.querySelectorAll('.toggle').forEach(function(t) {
+    t.addEventListener('click', function() { this.classList.toggle('on'); });
+  });
+  // Wire sign out
+  var so = document.querySelector('.signout-row');
+  if (so) { so.style.cursor='pointer'; so.addEventListener('click', function() { navTo('login',null); showToast('Signed out successfully'); }); }
+  // Wire settings arrow rows
+  document.querySelectorAll('.settings-row').forEach(function(row) {
+    var arrow = row.querySelector('.settings-arrow');
+    if (arrow) {
+      row.style.cursor = 'pointer';
+      row.addEventListener('click', function() { showToast('Feature coming soon'); });
+    }
+  });
+  // Wire "Pay Now" buttons in billing cards
+  document.querySelectorAll('.pay-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) { e.stopPropagation(); openPayModal('INV-2024-089', 1050); });
+  });
+  // Wire inline Pay Now buttons in invoice cards
+  var inlinePayBtns = document.querySelectorAll('[data-pay]');
+  inlinePayBtns.forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      openPayModal(this.dataset.pay, parseFloat(this.dataset.amount));
+    });
+  });
+  // Wire permits FAB
+  var permFab = document.querySelector('#screen-permits .fab-relative');
+  if (permFab) permFab.addEventListener('click', function() { openNewPermitModal(); });
+  // Wire claims submit btn
+  var claimSubmitBtn = document.querySelector('#screen-claims .submit-claim-btn');
+  if (claimSubmitBtn) claimSubmitBtn.addEventListener('click', function() { openNewClaimModal(); });
+  // Wire permits bottom nav
+  var permitsScreen = document.getElementById('screen-permits');
+  if (permitsScreen) {
+    var bns = permitsScreen.querySelectorAll('.bn-item');
+    if (bns[0]) bns[0].addEventListener('click', function(){ navTo('dashboard','nav-dashboard'); });
+    if (bns[1]) bns[1].addEventListener('click', function(){ navTo('service-requests','nav-sr'); });
+    if (bns[2]) bns[2].addEventListener('click', function(){ navTo('billing','nav-billing'); });
+    if (bns[3]) bns[3].addEventListener('click', function(){ navTo('profile','nav-profile'); });
+  }
+  // Wire claims bottom nav
+  var claimsScreen = document.getElementById('screen-claims');
+  if (claimsScreen) {
+    var cbns = claimsScreen.querySelectorAll('.bn-item');
+    if (cbns[0]) cbns[0].addEventListener('click', function(){ navTo('dashboard','nav-dashboard'); });
+    if (cbns[1]) cbns[1].addEventListener('click', function(){ navTo('service-requests','nav-sr'); });
+    if (cbns[2]) cbns[2].addEventListener('click', function(){ navTo('billing','nav-billing'); });
+    if (cbns[3]) cbns[3].addEventListener('click', function(){ navTo('profile','nav-profile'); });
+  }
+  // Wire registration back btn
+  var regScreen = document.getElementById('screen-registration');
+  if (regScreen) {
+    var regBack = regScreen.querySelector('.back-btn');
+    if (regBack) regBack.addEventListener('click', function(){ navTo('dashboard','nav-dashboard'); });
+  }
+  // Wire billing header Pay Now button (full outstanding)
+  var billingPayBtn = document.querySelector('#screen-billing .billing-header .pay-btn');
+  if (billingPayBtn) billingPayBtn.addEventListener('click', function(e){ e.stopPropagation(); openPayModal('ALL',18400); });
+  // Wire billing "See all" 
+  document.querySelectorAll('.section-see-all').forEach(function(el){ el.style.cursor='pointer'; });
+  // Wire registration Create button
+  var regCreateBtn = document.querySelector('#screen-registration .primary-btn-full');
+  if (regCreateBtn) regCreateBtn.addEventListener('click', function(){ showToast('✅ Maximo record created — MHASSAN'); });
+  var regDraftBtn = document.querySelector('#screen-registration .secondary-btn-full');
+  if (regDraftBtn) regDraftBtn.addEventListener('click', function(){ showToast('💾 Saved as draft'); });
+  // Upload zone in claims
+  document.querySelectorAll('.upload-zone').forEach(function(uz){
+    uz.addEventListener('click', function(){ showToast('📎 File picker coming soon'); });
+  });
+  // Wire permit cards to open detail
+  document.querySelectorAll('#screen-permits .list-card').forEach(function(card, idx){
+    card.addEventListener('click', function(){ openPermitDetail(idx); });
+  });
+  // Wire claim cards
+  document.querySelectorAll('#screen-claims .list-card').forEach(function(card, idx){
+    card.addEventListener('click', function(){ openClaimDetail(idx); });
+  });
+});
+
+/* ══ TOAST ══ */
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(function(){ t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(20px)'; }, 2800);
+}
+
+/* ══════════════════════════════════════════
+   SR DETAIL MODAL
+══════════════════════════════════════════ */
+var srDetailData = {
+  'SR-20240312': {
+    id:'SR-20240312', title:'HVAC System Maintenance — Office Floor 3',
+    status:'INPRG', statusClass:'pill-INPRG', priority:'P2 — Normal',
+    location:'WVR-Z1-003-3-07', site:'WESAL-SITE', reportedBy:'Mohamed Hassan',
+    reportDate:'Mar 12, 2024', updatedDate:'Mar 21, 2024',
+    desc:'Routine HVAC servicing and filter replacement required for all cooling units on the third floor east wing. Units have not been serviced in 6 months and performance is degraded.',
+    steps:['NEW','WAPPR','INPRG','COMP','CLOSE'], currentStep:2,
+    comments:[
+      {user:'Ahmed Khalid',date:'Mar 21, 2024',text:'Technician dispatched. Estimated completion by EOD.'},
+      {user:'System',date:'Mar 20, 2024',text:'SR approved by supervisor. Work order created: WO-10234.'}
+    ]
+  },
+  'SR-20240308': {
+    id:'SR-20240308', title:'Electrical Panel Inspection — B1 Level',
+    status:'WAPPR', statusClass:'pill-WAPPR', priority:'P1 — High',
+    location:'WVR-Z2-001-B1-02', site:'WESAL-SITE', reportedBy:'Mohamed Hassan',
+    reportDate:'Mar 8, 2024', updatedDate:'Mar 20, 2024',
+    desc:'Annual electrical safety inspection for all distribution panels in basement level. Inspection required by safety compliance team before end of Q1.',
+    steps:['NEW','WAPPR','INPRG','COMP','CLOSE'], currentStep:1,
+    comments:[
+      {user:'System',date:'Mar 10, 2024',text:'SR submitted. Awaiting supervisor approval before scheduling.'}
+    ]
+  },
+  'SR-20240301': {
+    id:'SR-20240301', title:'Water Leak — Server Room Ceiling',
+    status:'RESOLVED', statusClass:'pill-RESOLVED', priority:'P1 — Critical',
+    location:'WVR-Z1-002-2-05', site:'WESAL-SITE', reportedBy:'Mohamed Hassan',
+    reportDate:'Mar 1, 2024', updatedDate:'Mar 15, 2024',
+    desc:'Emergency water ingress from ceiling above main server rack discovered. Risk to critical infrastructure. Emergency repair team deployed same day.',
+    steps:['NEW','WAPPR','INPRG','COMP','CLOSE'], currentStep:4,
+    comments:[
+      {user:'Ibrahim Al-Rashid',date:'Mar 15, 2024',text:'Repair complete. Waterproofing applied. Area cleared and inspected.'},
+      {user:'Ahmed Khalid',date:'Mar 3, 2024',text:'Emergency repair team deployed. Estimated 2-day job.'},
+      {user:'System',date:'Mar 1, 2024',text:'Critical SR raised. Auto-approved due to emergency priority.'}
+    ]
+  },
+  'SR-20240322': {
+    id:'SR-20240322', title:'Generator Fuel Top-Up Request',
+    status:'NEW', statusClass:'pill-NEW', priority:'P1 — Urgent',
+    location:'WVR-Z3-006-G-01', site:'WESAL-SITE', reportedBy:'Mohamed Hassan',
+    reportDate:'Mar 22, 2024', updatedDate:'Mar 22, 2024',
+    desc:'Emergency generator diesel tank at 28% capacity — below minimum 30% safety threshold. Refueling required immediately to ensure backup power continuity.',
+    steps:['NEW','WAPPR','INPRG','COMP','CLOSE'], currentStep:0,
+    comments:[]
+  }
+};
+
+function openSRDetail(id) {
+  var sr = srDetailData[id];
+  if (!sr) return;
+  var stepsHtml = '<div class="timeline" style="margin:12px 0 4px;">';
+  var stepLabels = ['New','WAPPR','INPRG','Comp','Closed'];
+  for (var i=0;i<sr.steps.length;i++) {
+    var cls = i < sr.currentStep ? 'done' : i === sr.currentStep ? 'active' : 'pending';
+    var icon = cls==='done'?'✓':cls==='active'?'▶':'–';
+    stepsHtml += '<div class="tl-step"><div class="tl-dot '+cls+'">'+icon+'</div><div class="tl-label">'+stepLabels[i]+'</div></div>';
+    if (i < sr.steps.length-1) stepsHtml += '<div class="tl-line '+(i<sr.currentStep?'done':'pending')+'"></div>';
+  }
+  stepsHtml += '</div>';
+  var commentsHtml = sr.comments.length ? sr.comments.map(function(c){
+    return '<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;margin-bottom:8px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+      '<span style="font-size:12px;font-weight:600;color:var(--gray-900);">'+c.user+'</span>' +
+      '<span style="font-size:10px;color:var(--gray-500);">'+c.date+'</span></div>' +
+      '<div style="font-size:12px;color:var(--gray-700);">'+c.text+'</div></div>';
+  }).join('') : '<div style="font-size:12px;color:var(--gray-500);text-align:center;padding:16px;">No comments yet.</div>';
+  document.getElementById('sr-detail-content').innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">' +
+      '<div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;color:var(--gray-500);margin-bottom:4px;">'+sr.id+' · MXSR</div>' +
+      '<div style="font-size:16px;font-weight:700;color:var(--gray-900);line-height:1.3;">'+sr.title+'</div></div>' +
+      '<span class="status-pill '+sr.statusClass+'" style="flex-shrink:0;margin-left:8px;">'+sr.status+'</span>' +
+    '</div>' +
+    stepsHtml +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0;">' +
+      '<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;"><div style="font-size:9px;color:var(--gray-500);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Priority</div><div style="font-size:12px;font-weight:600;color:var(--gray-900);margin-top:3px;">'+sr.priority+'</div></div>' +
+      '<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;"><div style="font-size:9px;color:var(--gray-500);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Site</div><div style="font-size:11px;font-weight:600;color:var(--gray-900);margin-top:3px;font-family:\'IBM Plex Mono\',monospace;">'+sr.site+'</div></div>' +
+      '<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;"><div style="font-size:9px;color:var(--gray-500);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Location</div><div style="font-size:11px;font-weight:600;color:var(--gray-900);margin-top:3px;font-family:\'IBM Plex Mono\',monospace;">'+sr.location+'</div></div>' +
+      '<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;"><div style="font-size:9px;color:var(--gray-500);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Reported</div><div style="font-size:11px;font-weight:600;color:var(--gray-900);margin-top:3px;">'+sr.reportDate+'</div></div>' +
+    '</div>' +
+    '<div style="font-size:11px;font-weight:600;color:var(--gray-700);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Description</div>' +
+    '<div style="font-size:12px;color:var(--gray-700);line-height:1.6;background:var(--gray-50);border-radius:8px;padding:10px 12px;margin-bottom:14px;">'+sr.desc+'</div>' +
+    '<div style="font-size:11px;font-weight:600;color:var(--gray-700);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Comments & Updates</div>' +
+    commentsHtml +
+    '<div style="margin-top:12px;"><textarea placeholder="Add a comment…" style="width:100%;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:10px 14px;font-size:13px;font-family:\'IBM Plex Sans\',sans-serif;resize:none;height:72px;outline:none;"></textarea>' +
+    '<div style="display:flex;gap:8px;margin-top:8px;">' +
+      '<button onclick="showToast(\'📎 Attachment picker coming soon\')" style="flex:1;padding:11px;background:var(--gray-100);color:var(--gray-700);border:none;border-radius:var(--radius-input);font-size:13px;font-weight:600;cursor:pointer;">📎 Attach</button>' +
+      '<button onclick="showToast(\'✅ Comment added successfully\')" style="flex:2;padding:11px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-input);font-size:13px;font-weight:700;cursor:pointer;">Add Comment</button>' +
+    '</div></div>';
+  document.getElementById('sr-detail-modal').style.display = 'flex';
+}
+
+/* ══════════════════════════════════════════
+   PERMIT DETAIL MODAL
+══════════════════════════════════════════ */
+var permitDetailData = [
+  {id:'WP-4421',title:'Hot Work Permit — Refinery Unit 3',type:'HOT WORK',status:'PENDING',statusClass:'pill-WAPPR',
+   from:'Mar 15, 2024',to:'Mar 17, 2024',location:'WVR-Z2-001-G-01',requestedBy:'Mohamed Hassan',
+   steps:[{n:1,title:'Request Submitted',detail:'Mar 13, 2024',state:'done'},{n:2,title:'Safety Officer Review',detail:'Mar 14, 2024 — Approved',state:'done'},{n:3,title:'Supervisor Approval',detail:'In Progress',state:'active'},{n:4,title:'Permit Issued',detail:'Pending',state:'pending'}]},
+  {id:'WP-4398',title:'Electrical Maintenance — LV Switchboard',type:'ELECTRICAL',status:'APPROVED',statusClass:'pill-APPROVED',
+   from:'Mar 10, 2024',to:'Mar 12, 2024',location:'WVR-Z1-003-B1-02',requestedBy:'Mohamed Hassan',
+   steps:[{n:1,title:'Request Submitted',detail:'Mar 8, 2024',state:'done'},{n:2,title:'Safety Officer Review',detail:'Mar 9, 2024 — Approved',state:'done'},{n:3,title:'Supervisor Approval',detail:'Mar 10, 2024 — Approved',state:'done'},{n:4,title:'Permit Issued',detail:'Mar 10, 2024',state:'done'}]},
+  {id:'WP-4350',title:'Confined Space Entry — Tank Farm',type:'CONFINED SPACE',status:'EXPIRED',statusClass:'pill-EXPIRED',
+   from:'Feb 20, 2024',to:'Feb 22, 2024',location:'WVR-Z3-007-G-03',requestedBy:'Mohamed Hassan',
+   steps:[{n:1,title:'Request Submitted',detail:'Feb 18, 2024',state:'done'},{n:2,title:'Safety Officer Review',detail:'Feb 19, 2024 — Approved',state:'done'},{n:3,title:'Supervisor Approval',detail:'Feb 20, 2024 — Approved',state:'done'},{n:4,title:'Permit Issued',detail:'Feb 20, 2024',state:'done'}]}
+];
+
+function openPermitDetail(idx) {
+  var p = permitDetailData[idx];
+  if (!p) return;
+  var stepsHtml = p.steps.map(function(s){
+    return '<div class="wf-step"><div class="wf-circle '+s.state+'">'+s.n+'</div>' +
+      '<div class="wf-body"><div class="wf-title">'+s.title+'</div><div class="wf-detail">'+s.detail+'</div></div>' +
+      '<div class="wf-state-icon">'+(s.state==='done'?'✅':s.state==='active'?'⏳':'⬜')+'</div></div>';
+  }).join('');
+  document.getElementById('sr-detail-content').innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">' +
+      '<div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;color:var(--gray-500);margin-bottom:4px;">'+p.id+' · MXWOPERMIT</div>' +
+      '<div style="font-size:16px;font-weight:700;color:var(--gray-900);line-height:1.3;">'+p.title+'</div></div>' +
+      '<span class="status-pill '+p.statusClass+'" style="flex-shrink:0;margin-left:8px;">'+p.status+'</span>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">' +
+      '<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;"><div style="font-size:9px;color:var(--gray-500);font-weight:600;text-transform:uppercase;">Type</div><div style="font-size:11px;font-weight:600;color:var(--gray-900);margin-top:3px;">'+p.type+'</div></div>' +
+      '<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;"><div style="font-size:9px;color:var(--gray-500);font-weight:600;text-transform:uppercase;">Location</div><div style="font-size:11px;font-weight:600;color:var(--gray-900);margin-top:3px;font-family:\'IBM Plex Mono\',monospace;">'+p.location+'</div></div>' +
+      '<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;"><div style="font-size:9px;color:var(--gray-500);font-weight:600;text-transform:uppercase;">Valid From</div><div style="font-size:11px;font-weight:600;color:var(--gray-900);margin-top:3px;">'+p.from+'</div></div>' +
+      '<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;"><div style="font-size:9px;color:var(--gray-500);font-weight:600;text-transform:uppercase;">Valid To</div><div style="font-size:11px;font-weight:600;color:var(--gray-900);margin-top:3px;">'+p.to+'</div></div>' +
+    '</div>' +
+    '<div style="font-size:11px;font-weight:600;color:var(--gray-700);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Approval Workflow</div>' +
+    '<div class="workflow">'+stepsHtml+'</div>' +
+    (p.status==='PENDING'?'<button onclick="showToast(\'📧 Approval reminder sent\');this.style.background=\'var(--primary-dark)\';" style="width:100%;margin-top:14px;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-input);font-size:14px;font-weight:600;cursor:pointer;">Send Reminder to Approver</button>':
+     p.status==='APPROVED'?'<button onclick="showToast(\'📥 Permit PDF downloaded\')" style="width:100%;margin-top:14px;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-input);font-size:14px;font-weight:600;cursor:pointer;">Download Permit PDF</button>':'');
+  document.getElementById('sr-detail-modal').style.display = 'flex';
+}
+
+/* ══════════════════════════════════════════
+   CLAIM DETAIL MODAL
+══════════════════════════════════════════ */
+var claimDetailData = [
+  {id:'CLM-042',title:'Equipment Damage — Storm Event',type:'INSURANCE',status:'REVIEW',statusClass:'pill-REVIEW',
+   claimed:5100,approved:null,submitted:'Feb 28, 2024',desc:'Storm event caused significant damage to rooftop HVAC units. Insurance claim filed for repair and replacement costs.',
+   docs:['Site Assessment Report.pdf','Photo Evidence — 24 photos','Contractor Quote — March 2024']},
+  {id:'CLM-039',title:'Warranty Claim — Chiller Unit',type:'WARRANTY',status:'APPROVED',statusClass:'pill-APPROVED',
+   claimed:12800,approved:10200,submitted:'Jan 15, 2024',desc:'Industrial chiller unit failure within warranty period. Claim approved for parts and labor replacement.',
+   docs:['Warranty Certificate.pdf','Failure Analysis Report.pdf','Invoice Copy.pdf']},
+  {id:'CLM-035',title:'Service Level Breach — Elevator',type:'SERVICE',status:'REJECTED',statusClass:'pill-REJECTED',
+   claimed:3200,approved:0,submitted:'Dec 5, 2023',desc:'SLA breach claim for elevator downtime exceeding contractual limits. Claim rejected — force majeure clause applied.',
+   docs:['Downtime Log.xlsx','SLA Contract Extract.pdf']}
+];
+
+function openClaimDetail(idx) {
+  var c = claimDetailData[idx];
+  if (!c) return;
+  var docsHtml = c.docs.map(function(d){
+    return '<div onclick="showToast(\'📄 Opening: '+d+'\')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--gray-50);border-radius:6px;cursor:pointer;margin-bottom:6px;">' +
+      '<span style="font-size:14px;">📄</span><span style="font-size:12px;color:var(--gray-700);">'+d+'</span>' +
+      '<span style="margin-left:auto;font-size:11px;color:var(--primary-dark);font-weight:600;">View</span></div>';
+  }).join('');
+  var amtHtml = c.approved !== null ?
+    '<div style="background:var(--primary-light);border-radius:8px;padding:12px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">' +
+    '<div><div style="font-size:9px;color:var(--primary-dark);font-weight:600;text-transform:uppercase;">Approved Amount</div><div style="font-size:22px;font-weight:700;color:var(--primary-dark);">$'+c.approved.toLocaleString()+'</div></div>' +
+    '<div style="text-align:right;"><div style="font-size:11px;color:var(--gray-500);">of $'+c.claimed.toLocaleString()+' claimed</div></div></div>' :
+    '<div style="background:#fff3d0;border-radius:8px;padding:12px 14px;margin-bottom:14px;">' +
+    '<div style="font-size:9px;color:#b25c00;font-weight:600;text-transform:uppercase;">Claimed Amount Under Review</div>' +
+    '<div style="font-size:22px;font-weight:700;color:#b25c00;">$'+c.claimed.toLocaleString()+'</div></div>';
+  document.getElementById('sr-detail-content').innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">' +
+      '<div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;color:var(--gray-500);margin-bottom:4px;">'+c.id+' · MXCLAIM</div>' +
+      '<div style="font-size:16px;font-weight:700;color:var(--gray-900);line-height:1.3;">'+c.title+'</div></div>' +
+      '<span class="status-pill '+c.statusClass+'" style="flex-shrink:0;margin-left:8px;">'+c.status+'</span>' +
+    '</div>' +
+    amtHtml +
+    '<div style="background:var(--gray-50);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--gray-700);line-height:1.6;">'+c.desc+'</div>' +
+    '<div style="font-size:11px;font-weight:600;color:var(--gray-700);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Supporting Documents</div>' +
+    docsHtml +
+    '<button onclick="showToast(\'📎 File picker opening...\')" style="width:100%;margin-top:10px;padding:11px;background:var(--gray-100);color:var(--gray-700);border:none;border-radius:var(--radius-input);font-size:13px;font-weight:600;cursor:pointer;">+ Add Document</button>';
+  document.getElementById('sr-detail-modal').style.display = 'flex';
+}
+
+/* ══════════════════════════════════════════
+   NEW PERMIT MODAL
+══════════════════════════════════════════ */
+function openNewPermitModal() {
+  var types = ['HOT WORK','ACCESS','COLD WORK','CONFINED SPACE','ELECTRICAL','HEIGHT WORK'];
+  var typesHtml = types.map(function(t){
+    return '<div onclick="this.parentElement.querySelectorAll(\'[data-ptype]\').forEach(function(x){x.style.background=\'#fff\';x.style.borderColor=\'var(--gray-200)\';x.style.color=\'var(--gray-700)\'});this.style.background=\'var(--primary)\';this.style.borderColor=\'var(--primary)\';this.style.color=\'#fff\'" data-ptype="1" style="padding:8px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:11px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;transition:all .15s;">'+t+'</div>';
+  }).join('');
+  document.getElementById('permit-modal-body').innerHTML =
+    '<div style="font-size:16px;font-weight:700;color:var(--gray-900);margin-bottom:4px;">New Permit Request</div>' +
+    '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;color:var(--gray-500);background:var(--gray-100);padding:2px 7px;border-radius:4px;display:inline-block;margin-bottom:16px;">POST /oslc/os/mxwopermit</div>' +
+    '<div style="font-size:11px;font-weight:600;color:var(--gray-700);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em;">Permit Type <span style="color:var(--accent-red)">*</span></div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;">'+typesHtml+'</div>' +
+    '<div style="font-size:11px;font-weight:600;color:var(--gray-700);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">Title / Description <span style="color:var(--accent-red)">*</span></div>' +
+    '<input placeholder="e.g. Hot Work — Welding at Refinery Unit 3" style="width:100%;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 14px;font-size:13px;color:var(--gray-900);outline:none;margin-bottom:12px;">' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">' +
+      '<div><div style="font-size:11px;font-weight:600;color:var(--gray-700);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">Start Date</div><input type="date" style="width:100%;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 12px;font-size:13px;outline:none;"></div>' +
+      '<div><div style="font-size:11px;font-weight:600;color:var(--gray-700);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">End Date</div><input type="date" style="width:100%;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 12px;font-size:13px;outline:none;"></div>' +
+    '</div>' +
+    '<div style="font-size:11px;font-weight:600;color:var(--gray-700);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">Location</div>' +
+    '<input placeholder="e.g. WVR-Z2-001-G-01" style="width:100%;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 14px;font-size:13px;font-family:\'IBM Plex Mono\',monospace;color:var(--gray-900);outline:none;margin-bottom:16px;">' +
+    '<div style="display:flex;gap:8px;">' +
+      '<button onclick="document.getElementById(\'new-permit-modal\').style.display=\'none\'" style="flex:1;padding:13px;background:#fff;color:var(--gray-700);border:1.5px solid var(--gray-300);border-radius:var(--radius-input);font-size:14px;font-weight:600;cursor:pointer;">Cancel</button>' +
+      '<button onclick="document.getElementById(\'new-permit-modal\').style.display=\'none\';showToast(\'✅ WP-4422 created in Maximo\')" style="flex:2;padding:13px;background:var(--primary-dark);color:#fff;border:none;border-radius:var(--radius-input);font-size:14px;font-weight:700;cursor:pointer;">Submit Permit Request</button>' +
+    '</div>';
+  document.getElementById('new-permit-modal').style.display = 'flex';
+}
+
+/* ══════════════════════════════════════════
+   NEW CLAIM MODAL
+══════════════════════════════════════════ */
+function openNewClaimModal() {
+  var types = ['INSURANCE','WARRANTY','DAMAGE','SERVICE','OTHER'];
+  var typesHtml = types.map(function(t){
+    return '<div onclick="this.parentElement.querySelectorAll(\'[data-ctype]\').forEach(function(x){x.style.background=\'#fff\';x.style.borderColor=\'var(--gray-200)\';x.style.color=\'var(--gray-700)\'});this.style.background=\'var(--primary)\';this.style.borderColor=\'var(--primary)\';this.style.color=\'#fff\'" data-ctype="1" style="padding:8px 14px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:11px;font-weight:600;color:var(--gray-700);cursor:pointer;background:#fff;transition:all .15s;">'+t+'</div>';
+  }).join('');
+  document.getElementById('claim-modal-body').innerHTML =
+    '<div style="font-size:16px;font-weight:700;color:var(--gray-900);margin-bottom:4px;">Submit New Claim</div>' +
+    '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;color:var(--gray-500);background:var(--gray-100);padding:2px 7px;border-radius:4px;display:inline-block;margin-bottom:16px;">POST /oslc/os/mxclaim</div>' +
+    '<div style="font-size:11px;font-weight:600;color:var(--gray-700);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em;">Claim Type <span style="color:var(--accent-red)">*</span></div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;">'+typesHtml+'</div>' +
+    '<div style="font-size:11px;font-weight:600;color:var(--gray-700);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">Claim Title <span style="color:var(--accent-red)">*</span></div>' +
+    '<input placeholder="e.g. Equipment Damage — Storm Event" style="width:100%;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 14px;font-size:13px;color:var(--gray-900);outline:none;margin-bottom:12px;">' +
+    '<div style="font-size:11px;font-weight:600;color:var(--gray-700);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">Description</div>' +
+    '<textarea placeholder="Describe the incident and damages in detail…" style="width:100%;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 14px;font-size:13px;font-family:\'IBM Plex Sans\',sans-serif;resize:none;height:72px;outline:none;margin-bottom:12px;"></textarea>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">' +
+      '<div><div style="font-size:11px;font-weight:600;color:var(--gray-700);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">Claimed Amount</div><input type="number" placeholder="0.00" style="width:100%;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 12px;font-size:13px;outline:none;"></div>' +
+      '<div><div style="font-size:11px;font-weight:600;color:var(--gray-700);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">Incident Date</div><input type="date" style="width:100%;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 12px;font-size:13px;outline:none;"></div>' +
+    '</div>' +
+    '<div style="border:2px dashed var(--gray-300);border-radius:var(--radius-card);padding:14px;text-align:center;cursor:pointer;margin-bottom:16px;" onclick="showToast(\'📎 File picker coming soon\')">' +
+      '<div style="font-size:20px;margin-bottom:4px;">📎</div>' +
+      '<div style="font-size:12px;color:var(--gray-500);">Attach supporting documents</div>' +
+      '<div style="font-size:10px;color:var(--gray-500);margin-top:2px;">PDF, JPG, PNG, XLSX — max 20MB</div>' +
+    '</div>' +
+    '<div style="display:flex;gap:8px;">' +
+      '<button onclick="document.getElementById(\'new-claim-modal\').style.display=\'none\'" style="flex:1;padding:13px;background:#fff;color:var(--gray-700);border:1.5px solid var(--gray-300);border-radius:var(--radius-input);font-size:14px;font-weight:600;cursor:pointer;">Cancel</button>' +
+      '<button onclick="document.getElementById(\'new-claim-modal\').style.display=\'none\';showToast(\'✅ CLM-043 submitted to Maximo\')" style="flex:2;padding:13px;background:var(--primary-dark);color:#fff;border:none;border-radius:var(--radius-input);font-size:14px;font-weight:700;cursor:pointer;">Submit Claim</button>' +
+    '</div>';
+  document.getElementById('new-claim-modal').style.display = 'flex';
+}
+
+/* ══════════════════════════════════════════
+   PAY MODAL
+══════════════════════════════════════════ */
+function openPayModal(invId, amount) {
+  var methods = [
+    {icon:'🏦',label:'Bank Transfer',val:'BANKTRANSFER'},
+    {icon:'💳',label:'Card Payment',val:'CARD'},
+    {icon:'🔄',label:'Direct Debit',val:'DIRECTDEBIT'}
+  ];
+  var methodsHtml = methods.map(function(m){
+    return '<div onclick="this.parentElement.querySelectorAll(\'[data-pmethod]\').forEach(function(x){x.style.background=\'#fff\';x.style.borderColor=\'var(--gray-200)\'});this.style.background=\'var(--primary-light)\';this.style.borderColor=\'var(--primary)\'" data-pmethod="1" style="flex:1;padding:12px 8px;border:1.5px solid var(--gray-200);border-radius:8px;cursor:pointer;text-align:center;background:#fff;transition:all .15s;">' +
+      '<div style="font-size:20px;margin-bottom:4px;">'+m.icon+'</div><div style="font-size:11px;font-weight:600;color:var(--gray-700);">'+m.label+'</div></div>';
+  }).join('');
+  var amtDisplay = invId==='ALL' ? '$18,400.00' : '$'+amount.toLocaleString()+'.00';
+  document.getElementById('pay-modal-body').innerHTML =
+    '<div style="font-size:16px;font-weight:700;color:var(--gray-900);margin-bottom:4px;">Process Payment</div>' +
+    '<div style="font-size:12px;color:var(--gray-500);margin-bottom:16px;">'+(invId==='ALL'?'All outstanding invoices':invId)+'</div>' +
+    '<div style="background:var(--primary-light);border-radius:10px;padding:16px;text-align:center;margin-bottom:16px;">' +
+      '<div style="font-size:11px;font-weight:600;color:var(--primary-dark);text-transform:uppercase;margin-bottom:4px;">Amount Due</div>' +
+      '<div style="font-size:32px;font-weight:700;color:var(--primary-dark);">'+amtDisplay+'</div>' +
+    '</div>' +
+    '<div style="font-size:11px;font-weight:600;color:var(--gray-700);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em;">Payment Method</div>' +
+    '<div style="display:flex;gap:8px;margin-bottom:14px;">'+methodsHtml+'</div>' +
+    '<div style="font-size:11px;font-weight:600;color:var(--gray-700);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">Payment Reference</div>' +
+    '<input placeholder="e.g. TXN-2024-0043" style="width:100%;background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-input);padding:11px 14px;font-size:13px;font-family:\'IBM Plex Mono\',monospace;color:var(--gray-900);outline:none;margin-bottom:16px;">' +
+    '<div style="display:flex;gap:8px;">' +
+      '<button onclick="document.getElementById(\'pay-modal\').style.display=\'none\'" style="flex:1;padding:13px;background:#fff;color:var(--gray-700);border:1.5px solid var(--gray-300);border-radius:var(--radius-input);font-size:14px;font-weight:600;cursor:pointer;">Cancel</button>' +
+      '<button onclick="document.getElementById(\'pay-modal\').style.display=\'none\';showToast(\'✅ Payment of '+amtDisplay+' processed\')" style="flex:2;padding:13px;background:var(--primary-dark);color:#fff;border:none;border-radius:var(--radius-input);font-size:14px;font-weight:700;cursor:pointer;">Confirm Payment</button>' +
+    '</div>';
+  document.getElementById('pay-modal').style.display = 'flex';
+}
+
+/* ══ Wire Pay Now buttons in invoice cards (inline) ══ */
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('.pay-now-inline');
+  if (btn) { e.stopPropagation(); openPayModal(btn.dataset.inv, parseFloat(btn.dataset.amount||1050)); }
+});
+</script>
+</body>
+</html>
